@@ -1,13 +1,11 @@
 import numpy as np
 import random
-# np.set_printoptions(threshold=np.inf) # Use this to see full 50x50 numpy matrix
-# np.set_printoptions(linewidth=1000) # Use this to fit each row in a single line without breaks
-
-open_cells = set() # Stores current open cells in grid
+np.set_printoptions(threshold=np.inf) # Use this to see full 50x50 numpy matrix
+np.set_printoptions(linewidth=1000) # Use this to fit each row in a single line without breaks
 
 # Function to find current open cells in grid
 def find_all_open_cells(grid):
-    global open_cells
+    open_cells = set()
 
     for i in range(50):
         for j in range(50):
@@ -100,8 +98,36 @@ def create_grid():
         grid = open_random_closed_neighbor(i[0], i[1], grid)
 
     # Find current open cells in grid
-    find_all_open_cells(grid)
+    open_cells = find_all_open_cells(grid)
 
-    return grid
+    return grid, open_cells
 
-print(create_grid())
+# Function to place the bot at a random open cell in the grid
+def place_bot(grid, open_cells):
+    bot = random.choice(tuple(open_cells)) # Pick a random cell
+    grid[bot[0], bot[1]] = 2 # Place bot in grid and label space as 2
+    open_cells.remove(bot)
+
+    return bot
+
+# Function to place the crew at a random open cell in the grid (must occur after placing bot)
+def place_crew(grid, open_cells, crew_list):
+    crew = random.choice(tuple(open_cells - set(crew_list))) # Pick a random cell without an existing crew member
+    grid[crew[0], crew[1]] = 4 # Place crew member in grid and label space as 4
+    crew_list.append(crew)
+
+    return crew_list
+
+# ship, open_cells = create_grid()
+# print(ship, open_cells, "\n")
+
+# bot = place_bot(ship, open_cells)
+# print(ship, bot, open_cells.__contains__(bot), "\n")
+
+# crew_list = []
+
+# crew_list = place_crew(ship, open_cells, crew_list)
+# print(ship, crew_list, set(crew_list).issubset(open_cells), "\n")
+
+# crew_list = place_crew(ship, open_cells, crew_list)
+# print(ship, crew_list, set(crew_list).issubset(open_cells), "\n")
