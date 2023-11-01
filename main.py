@@ -118,16 +118,76 @@ def place_crew(grid, open_cells, crew_list):
 
     return crew_list
 
-# ship, open_cells = create_grid()
+# Function to place an alien at a unoccupied cell in the grid
+def place_alien(grid, open_cells, alien_list, bot, detect_sqaure_k):
+    alien = None
+    # Make sure alien is not in detection square 
+    while True:
+        alien = random.choice(tuple(open_cells - set(alien_list))) # Pick open cell that is unoccupied by another alien
+        if not ((alien[0] >= (bot[0]-detect_sqaure_k)) and (alien[0] <= (bot[0]+detect_sqaure_k))) and ((alien[1] >= (bot[1]-detect_sqaure_k)) and (alien[1] <= (bot[1]+detect_sqaure_k))):
+            break
+    
+    grid[alien[0]][alien[1]] = 3 # Place alien in grid and denote space as 3
+    alien_list.append(alien)
+    return alien_list
+
+# Function to ensure that potential cells to move to is in bounds
+def check_valid_neighbors(dim, x_coord, y_coord):
+    neigh_list = []
+    neigh_list.append((x_coord+1, y_coord))
+    neigh_list.append((x_coord-1, y_coord))
+    neigh_list.append((x_coord, y_coord+1))
+    neigh_list.append((x_coord, y_coord-1))
+    main_list = []
+    for neigh in neigh_list:
+        if neigh[0] <= dim-1 and neigh[0] >= 0 and neigh[1] <= dim-1 and neigh[1] >= 0:
+            main_list.append(neigh)
+    return main_list
+
+# Move aliens randomly to adjacent cells
+def move_aliens(grid, alien_list, bot):
+    random.shuffle(alien_list)
+    new_position = []
+    marker = 0
+    for alien in alien_list:
+        possible_moves = check_valid_neighbors(len(grid), alien[0], alien[1])
+        possible_moves.append(alien)
+        # Get all spatially possible coordinates that the alien can move to 
+        while possible_moves:
+            current = random.choice(possible_moves)
+            # Check if cell is open 
+            if grid[current[0]][current[1]] == 1:
+                possible_moves.remove(current)
+                continue
+            # Check if alien captures bot
+            if current == bot:
+                marker = 1
+                new_position.append(current)
+                new_position.extend(alien_list[alien_list.index(alien)+1: len(alien_list)])
+                return marker, new_position
+            grid[alien[0]][alien[1]] = 0
+            grid[current[0]][current[1]] = 3
+            new_position.append(current)
+            break
+                
+        
+    return marker, new_position 
+
+ship, open_cells = create_grid()
 # print(ship, open_cells, "\n")
 
-# bot = place_bot(ship, open_cells)
+bot = place_bot(ship, open_cells)
 # print(ship, bot, open_cells.__contains__(bot), "\n")
 
-# crew_list = []
+crew_list = []
 
-# crew_list = place_crew(ship, open_cells, crew_list)
+crew_list = place_crew(ship, open_cells, crew_list)
 # print(ship, crew_list, set(crew_list).issubset(open_cells), "\n")
-
-# crew_list = place_crew(ship, open_cells, crew_list)
-# print(ship, crew_list, set(crew_list).issubset(open_cells), "\n")
+alien_list = []
+crew_list = place_crew(ship, open_cells, crew_list)
+alien_list = place_alien(ship, open_cells, alien_list, bot, 1)
+print(alien_list)
+marker, alien_list = move_aliens(ship, alien_list, bot)
+print(ship)
+print(alien_list)
+#print(ship, crew_list, set(crew_list).issubset(open_cells), "\n")
