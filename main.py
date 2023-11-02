@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import math
 np.set_printoptions(threshold=np.inf) # Use this to see full 50x50 numpy matrix
 np.set_printoptions(linewidth=1000) # Use this to fit each row in a single line without breaks
 
@@ -119,12 +120,12 @@ def place_crew(grid, open_cells, crew_list):
     return crew_list
 
 # Function to place an alien at a unoccupied cell in the grid
-def place_alien(grid, open_cells, alien_list, bot, detect_sqaure_k):
+def place_alien(grid, open_cells, alien_list, bot, detect_square_k):
     alien = None
     # Make sure alien is not in detection square 
     while True:
         alien = random.choice(tuple(open_cells - set(alien_list))) # Pick open cell that is unoccupied by another alien
-        if not ((alien[0] >= (bot[0]-detect_sqaure_k)) and (alien[0] <= (bot[0]+detect_sqaure_k))) and ((alien[1] >= (bot[1]-detect_sqaure_k)) and (alien[1] <= (bot[1]+detect_sqaure_k))):
+        if not ((alien[0] >= (bot[0]-detect_square_k)) and (alien[0] <= (bot[0]+detect_square_k))) and not ((alien[1] >= (bot[1]-detect_square_k)) and (alien[1] <= (bot[1]+detect_square_k))):
             break
     
     grid[alien[0]][alien[1]] = 3 # Place alien in grid and denote space as 3
@@ -171,7 +172,60 @@ def move_aliens(grid, alien_list, bot):
             break
                 
         
-    return marker, new_position 
+    return marker, new_position
+
+# Sensor to detect aliens within a (2k + 1) x (2k + 1) square around bot
+def alien_sensor(alien_list, bot, k):
+    bot_x_max = min(bot[0] + k, 49) # k cells to the right of bot
+    bot_x_min = max(0, bot[0] - k) # k cells to the left of bot
+    bot_y_max = min(bot[1] + k, 49) # k cells to the top of bot
+    bot_y_min = max(0, bot[1] - k) # k cells to the bottom of bot
+
+    # Check if each alien is within the detection square
+    for alien in alien_list:
+        if (alien[0] > bot_x_min and alien[0] < bot_x_max) and (alien[1] > bot_y_min and alien[1] < bot_y_max):
+            return True
+    
+    return False
+
+# Generate cost map, i.e., distance of each cell on grid from bot
+# This might help update the bot's knowledge of alien and crew positions after every time step
+def find_cost_map(grid, bot):
+    cost_map = np.full((50, 50), 100)
+    seen_cells = set()
+    bfs_queue = []
+    bfs_queue.append(bot)
+    seen_cells.add(bot)
+    cost_map[bot[0], bot[1]] = 0
+
+    # Use BFS to find shortest path cost from bot to every unblocked cell (including aliens + crew)
+    while len(bfs_queue) > 0:
+        curr_cell = bfs_queue.pop(0)
+        neighbors = check_valid_neighbors(50, curr_cell[0], curr_cell[1])
+
+        for neighbor in neighbors:
+            if grid[neighbor[0], neighbor[1]] != 1 and neighbor not in seen_cells:
+                seen_cells.add(neighbor)
+                bfs_queue.append(neighbor)
+                cost_map[neighbor[0], neighbor[1]] = cost_map[curr_cell[0], curr_cell[1]] + 1 # Set distance of neighbor to current cell's distance + 1
+
+    return cost_map
+
+# Sensor to detect crew members within d-steps and beep with probability exp(-alpha * (d - 1))
+def crew_sensor(crew_list, cost_map, grid, bot, alpha, d):
+    cost_map = find_cost_map(grid, bot) # This can be where cost map update occurs (might change later)
+    
+    # For each crew member, check if cost (i.e., distance from bot) is <= d
+    for crew in crew_list:
+        if cost_map[crew[0], crew[1]] <= d:
+            prob = math.exp(-alpha * (d - 1))
+            return np.random.choice([True, False], p=[prob, 1 - prob]) # Beep with the specified probability
+        
+    return False
+
+
+
+# Testing Area
 
 ship, open_cells = create_grid()
 # print(ship, open_cells, "\n")
@@ -180,14 +234,23 @@ bot = place_bot(ship, open_cells)
 # print(ship, bot, open_cells.__contains__(bot), "\n")
 
 crew_list = []
+alien_list = []
 
 crew_list = place_crew(ship, open_cells, crew_list)
-# print(ship, crew_list, set(crew_list).issubset(open_cells), "\n")
-alien_list = []
 crew_list = place_crew(ship, open_cells, crew_list)
+crew_list.append(bot)
+# print(ship, crew_list, set(crew_list).issubset(open_cells), "\n")
+
 alien_list = place_alien(ship, open_cells, alien_list, bot, 1)
-print(alien_list)
-marker, alien_list = move_aliens(ship, alien_list, bot)
-print(ship)
-print(alien_list)
-#print(ship, crew_list, set(crew_list).issubset(open_cells), "\n")
+# print(alien_list)
+# marker, alien_list = move_aliens(ship, alien_list, bot)
+# print(ship)
+# print(alien_list)
+
+# print(alien_sensor(alien_list, bot, 5))
+# print(f"Aliens: {alien_list} \n Bot: {bot} \n Ship: {ship}")
+
+cost_map = find_cost_map(ship, bot)
+
+print(crew_sensor(crew_list, cost_map, ship, bot, 0.5, 10))
+print(f"Crew Members: {crew_list} \n Bot: {bot} \n Ship: {ship} \n Cost Map: {cost_map}")
