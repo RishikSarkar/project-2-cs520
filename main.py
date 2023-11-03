@@ -211,17 +211,18 @@ def find_cost_map(grid, bot):
 
     return cost_map
 
-# Sensor to detect crew members within d-steps and beep with probability exp(-alpha * (d - 1))
-def crew_sensor(crew_list, cost_map, grid, bot, alpha, d):
+# Sensor to detect distance d to closest crew member and beep with probability exp(-alpha * (d - 1))
+def crew_sensor(crew_list, cost_map, grid, bot, alpha):
     cost_map = find_cost_map(grid, bot) # This can be where cost map update occurs (might change later)
+    min_d = 100 # Actual distance of closest crew member
     
-    # For each crew member, check if cost (i.e., distance from bot) is <= d
+    # Find distance to closest crew member
     for crew in crew_list:
-        if cost_map[crew[0], crew[1]] <= d:
-            prob = math.exp(-alpha * (d - 1))
-            return np.random.choice([True, False], p=[prob, 1 - prob]) # Beep with the specified probability
-        
-    return False
+        if cost_map[crew[0], crew[1]] <= min_d:
+            min_d = cost_map[crew[0], crew[1]]
+    
+    prob = math.exp(-alpha * (min_d - 1)) 
+    return np.random.choice([True, False], p=[prob, 1 - prob]) # Beep with the specified probability
 
 
 
