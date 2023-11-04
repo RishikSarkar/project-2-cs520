@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import math
+import collections
 np.set_printoptions(threshold=np.inf) # Use this to see full 50x50 numpy matrix
 np.set_printoptions(linewidth=1000) # Use this to fit each row in a single line without breaks
 
@@ -188,40 +189,163 @@ def alien_sensor(alien_list, bot, k):
     
     return False
 
-# Generate cost map, i.e., distance of each cell on grid from bot
-# This might help update the bot's knowledge of alien and crew positions after every time step
-def find_cost_map(grid, bot):
-    cost_map = np.full((50, 50), 100)
-    seen_cells = set()
-    bfs_queue = []
-    bfs_queue.append(bot)
-    seen_cells.add(bot)
-    cost_map[bot[0], bot[1]] = 0
+# # Generate cost map, i.e., distance of each cell on grid from bot
+# # This might help update the bot's knowledge of alien and crew positions after every time step
+# def find_cost_map(grid, bot):
+#     cost_map = np.full((50, 50), 100)
+#     seen_cells = set()
+#     bfs_queue = []
+#     bfs_queue.append(bot)
+#     seen_cells.add(bot)
+#     cost_map[bot[0], bot[1]] = 0
 
-    # Use BFS to find shortest path cost from bot to every unblocked cell (including aliens + crew)
-    while len(bfs_queue) > 0:
-        curr_cell = bfs_queue.pop(0)
-        neighbors = check_valid_neighbors(50, curr_cell[0], curr_cell[1])
+#     # Use BFS to find shortest path cost from bot to every unblocked cell (including aliens + crew)
+#     while len(bfs_queue) > 0:
+#         curr_cell = bfs_queue.pop(0)
+#         neighbors = check_valid_neighbors(50, curr_cell[0], curr_cell[1])
 
-        for neighbor in neighbors:
-            if grid[neighbor[0], neighbor[1]] != 1 and neighbor not in seen_cells:
-                seen_cells.add(neighbor)
-                bfs_queue.append(neighbor)
-                cost_map[neighbor[0], neighbor[1]] = cost_map[curr_cell[0], curr_cell[1]] + 1 # Set distance of neighbor to current cell's distance + 1
+#         for neighbor in neighbors:
+#             if grid[neighbor[0], neighbor[1]] != 1 and neighbor not in seen_cells:
+#                 seen_cells.add(neighbor)
+#                 bfs_queue.append(neighbor)
+#                 cost_map[neighbor[0], neighbor[1]] = cost_map[curr_cell[0], curr_cell[1]] + 1 # Set distance of neighbor to current cell's distance + 1
 
-    return cost_map
+#     return cost_map
+
+
+
+# Determine shortest path (Constructs 2D array that keep track of the coordinates of the cells that can be reach a certain cell, Stop when crew coordinates reached)    
+def BFS(bot, crew, board, aliens):
+    q = collections.deque([bot])
+    visited = set(bot)
+    construct = np.full((50,50), None)
+    while q:
+        current = q.popleft()
+        possible_neigh = check_valid_neighbors(50, current[0], current[1])
+        if not possible_neigh or board[current[0]][current[1]] == 1 or current in aliens:
+            continue
+        if current == crew:
+            break
+        for neigh in possible_neigh:
+            if neigh not in visited:
+                q.append(neigh)
+                visited.add(neigh)
+                construct[neigh[0]][neigh[1]] = current
+    
+    
+    return construct
+
+# Outline the length of the path determined by BFS
+def getPath(construct, start, crew):
+    if construct[crew[0]][crew[1]] == None:
+        return None
+    path = []
+    current = crew
+    while current != start:
+        path.append(current)
+        current = construct[current[0]][current[1]]
+    path.reverse()
+    return len(path)
 
 # Sensor to detect crew members within d-steps and beep with probability exp(-alpha * (d - 1))
-def crew_sensor(crew_list, cost_map, grid, bot, alpha, d):
-    cost_map = find_cost_map(grid, bot) # This can be where cost map update occurs (might change later)
+def crew_sensor(grid, bot, crew_list, aliens, alpha):
+    #cost_map = find_cost_map(grid, bot) # This can be where cost map update occurs (might change later)
     
     # For each crew member, check if cost (i.e., distance from bot) is <= d
     for crew in crew_list:
-        if cost_map[crew[0], crew[1]] <= d:
-            prob = math.exp(-alpha * (d - 1))
-            return np.random.choice([True, False], p=[prob, 1 - prob]) # Beep with the specified probability
+        print(bot)
+        construct = BFS(bot, crew, grid, aliens)
+        d = getPath(construct, bot, crew)
+        print(d)
+        prob = math.exp(-alpha * (d - 1))
+        if np.random.choice([True, False], p=[prob, 1 - prob]): # Beep with the specified probability
+            return True 
         
     return False
+
+# Create alien probability matrix (dictionary) for t = 0
+def initialize_alienmatrix(open_cells, bot):
+    open_cells.add(bot)
+    # Alien can be at any open cell except the one occupied by the bot
+    inital_prob = [1/(len(open_cells) - 1)] * len(open_cells)
+    alien_matrix = dict(zip(open_cells, inital_prob))
+    bot_cell = {bot : 0}
+    alien_matrix.update(bot_cell)
+    open_cells.remove(bot)    
+    return alien_matrix
+
+# Create crew probability matrix (dictionary) for t = 0
+def initialize_crewmatrix(open_cells, crew_list, bot):
+    open_cells.add(bot)
+    # Alien can be at any open cell except the ones occupied by the bot or another crew
+    inital_prob = [1/(len(open_cells) - (1 + (len(crew_list)-1)))] * len(open_cells)
+    crew_matrix = dict(zip(open_cells, inital_prob))
+    bot_cell = {bot : 0}
+    crew_matrix.update(bot_cell)
+    open_cells.remove(bot)
+    return crew_matrix
+
+#Update probabilties for alien matrix based on detection 
+def update_alienmatrix(alien_matrix, detected, bot, k):
+        if detected:
+            # Cells outside detection square should have probability  0
+            detection_cells = [key for key in alien_matrix if not (((key[0] >= (bot[0]-k)) and (key[0] <= (bot[0]+k))) and ((key[1] >= (bot[1]-k)) and (key[1] <= (bot[1]+k))))] 
+            for cell in detection_cells:
+                new_prob = { cell: 0}
+                alien_matrix.update(new_prob)
+            in_square_cells = alien_matrix.keys() - detection_cells
+            sum = 0
+            for cell in in_square_cells:
+                sum = sum + alien_matrix[cell]
+            for cell in in_square_cells:
+                alien_matrix.update({cell : alien_matrix[cell] * (1/sum)})
+        else:
+            # Cells inside detection square show have probability 0
+            detection_cells = [key for key in alien_matrix if (((key[0] >= (bot[0]-k)) and (key[0] <= (bot[0]+k))) and ((key[1] >= (bot[1]-k)) and (key[1] <= (bot[1]+k))))]
+            for cell in detection_cells:
+                new_prob = { cell: 0}
+                alien_matrix.update(new_prob)
+            in_square_cells = alien_matrix.keys() - detection_cells
+            sum = 0
+            for cell in in_square_cells:
+                sum = sum + alien_matrix[cell]
+            for cell in in_square_cells:
+                alien_matrix.update({cell : alien_matrix[cell] * (1/sum)})
+            
+
+
+
+
+            
+    
+            return alien_matrix
+
+#Update probabilties for crew matrix based on beep
+def update_crewmatrix(crew_matrix, detected, bot, alpha):
+    return None
+
+
+# 1 crew 1 alien bot
+def Bot1(grid, open_cells, alien_list, crew_list, bot, k, alpha):
+    alien_matrix = initialize_alienmatrix(open_cells, bot)
+    crew_matrix = initialize_crewmatrix(open_cells, crew_list, bot)
+    while True:
+        alien_detected = alien_sensor(alien_list, bot, alpha) #Alien detector ran
+        alien_matrix = update_alienmatrix(alien_matrix, alien_detected, bot, k) # Update beliefs 
+        marker, alien_list = move_aliens(grid, alien_list, bot) # Move aliens
+        if marker:
+            print("Bot captured by alien!")
+            break
+        alien_detected = alien_sensor(alien_list, bot, alpha) 
+        alien_matrix = update_alienmatrix(alien_matrix, alien_detected, bot, k) # Update beliefs 
+        crew_detected = crew_sensor(grid, bot, crew_list, alien_list, 2) #
+
+
+
+    return True
+
+
+
 
 
 
@@ -237,20 +361,22 @@ crew_list = []
 alien_list = []
 
 crew_list = place_crew(ship, open_cells, crew_list)
-crew_list = place_crew(ship, open_cells, crew_list)
-crew_list.append(bot)
+# crew_list = place_crew(ship, open_cells, crew_list)
+# crew_list.append(bot)
 # print(ship, crew_list, set(crew_list).issubset(open_cells), "\n")
 
-alien_list = place_alien(ship, open_cells, alien_list, bot, 1)
-# print(alien_list)
-# marker, alien_list = move_aliens(ship, alien_list, bot)
-# print(ship)
-# print(alien_list)
-
+alien_list = place_alien(ship, open_cells, alien_list, bot, 2)
+#print(alien_list)
+#marker, alien_list = move_aliens(ship, alien_list, bot)
+#print(ship)
+#print(alien_list)
+#print(bot)
+#print(crew_sensor(ship, bot, crew_list, alien_list, 2))
 # print(alien_sensor(alien_list, bot, 5))
 # print(f"Aliens: {alien_list} \n Bot: {bot} \n Ship: {ship}")
 
-cost_map = find_cost_map(ship, bot)
+# cost_map = find_cost_map(ship, bot)
 
-print(crew_sensor(crew_list, cost_map, ship, bot, 0.5, 10))
-print(f"Crew Members: {crew_list} \n Bot: {bot} \n Ship: {ship} \n Cost Map: {cost_map}")
+# print(crew_sensor(crew_list, cost_map, ship, bot, 0.5, 10))
+# print(f"Crew Members: {crew_list} \n Bot: {bot} \n Ship: {ship} \n Cost Map: {cost_map}")
+Bot1(ship, open_cells, alien_list, crew_list, bot, 2, 2)
