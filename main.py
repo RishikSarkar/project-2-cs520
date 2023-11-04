@@ -252,6 +252,7 @@ def crew_sensor_alt(grid, bot, alpha):
 
     return False # Crew member not found, so no beep
 
+
 # Testing Area
 
 ship, open_cells = create_grid()
