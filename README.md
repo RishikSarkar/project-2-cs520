@@ -46,3 +46,8 @@ This repository contains our implementation of grid search strategies used by 8 
     - We know that P(B | C) = e^(-alpha * (d - 1))
     - P(C) = 1 / (total number of open cells - 1), since crew member cannot be at bot's current location
     - P(B) = ...
+ 
+- Info from Aravind from Office Hours:
+    - P(crew is at cell x | no beep) = P(no beep | crew is at cell x) * P(crew is at cell x) / P(no beep)
+    - Once expanded P(no beep | crew is at cell x) * P(crew is at cell x) / P(no beep), we should know how to calculate
+    - In the beginning, it is expected that the bot is moving randomly, but you have to break the ties 
