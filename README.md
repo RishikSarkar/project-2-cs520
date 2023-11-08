@@ -53,8 +53,11 @@ This repository contains our implementation of grid search strategies used by 8 
     - In the beginning, it is expected that the bot is moving randomly, but you have to break the ties
  
 - After bot moves, we have to update our beliefs:
-      - Updating alien probabilties:
-           - P( alien in j1 | alien not in i ) = P(alien in j1 and alien not in i) / P(alien not in i) =
-           - P(alien in j1) * P(alien not in i | alien in j1) / summation of j ( P(alien not i and alien in j)  =
-          - P(alien in j1) * P(alien not in i | alien in j1) / Summation of j (P(alien in j) * P(alien not in i  | alien in j))
+
+- Updating alien probabilties:
+
+- P( alien in j1 | alien not in i ) = P(alien in j1 and alien not in i) / P(alien not in i) =
+- P(alien in j1) * P(alien not in i | alien in j1) / summation of j ( P(alien not i and alien in j)  =
+- P(alien in j1) * P(alien not in i | alien in j1) / Summation of j (P(alien in j) * P(alien not in i  | alien in j))
+
 - Only thing is that this results in the previous spot of the bot having probability 0 and current spot of the bot having probability 0, which I feel like is wrong? 
