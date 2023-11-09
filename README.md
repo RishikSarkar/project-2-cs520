@@ -26,7 +26,7 @@ This repository contains our implementation of grid search strategies used by 8 
     - Let Aj = alien at cell j, B = beep at cell i
     - Thus, we have P(Aj | B) = P(Aj and B) / P(B)
 - Let us attempt to determine the probability
-    - P(Aj and B) / P(B) 
+    - P(Aj and B) / P(B)
         - = P(Aj and B) / (Sum of P(A and B) for all possible j values, i.e., all cells)
         - = P(Aj) P(B | Aj) / (Sum of P(A) P(B | A) for all possible j values)
     - We know that P(B | A) = 0 or 1
@@ -46,11 +46,19 @@ This repository contains our implementation of grid search strategies used by 8 
     - We know that P(B | C) = e^(-alpha * (d - 1))
     - P(C) = 1 / (total number of open cells - 1), since crew member cannot be at bot's current location
     - P(B) = ...
- 
+
 - Info from Aravind from Office Hours:
     - P(crew is at cell x | no beep) = P(no beep | crew is at cell x) * P(crew is at cell x) / P(no beep)
     - Once expanded P(no beep | crew is at cell x) * P(crew is at cell x) / P(no beep), we should know how to calculate
+    - Once expanded P(no beep | crew is at cell x) * P(crew is at cell x) / P(no beep), we should know how to calculate
         - P(crew is at cell x) = 1 / (total number of open cells - 1), since crew member cannot be at bot's current location
-        - P(no beep | crew is at cell x) = 
     - In the beginning, it is expected that the bot is moving randomly, but you have to break the ties
-    - 
+
+- After bot moves, we have to update our beliefs:
+
+- Updating alien probabilties:
+     - P( alien in j1 | alien not in i ) = P(alien in j1 and alien not in i) / P(alien not in i) =
+    - P(alien in j1) * P(alien not in i | alien in j1) / summation of j ( P(alien not i and alien in j)  =
+    - P(alien in j1) * P(alien not in i | alien in j1) / Summation of j (P(alien in j) * P(alien not in i  | alien in j))
+
+- Only thing is that this results in the previous spot of the bot having probability 0 and current spot of the bot having probability 0, which I feel like is wrong?
