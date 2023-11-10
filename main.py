@@ -247,7 +247,7 @@ def crew_sensor(grid, bot, alpha, d_lookup_table, crew_list):
         seen_cells.add(bot)
         d_dict[bot[0], bot[1]] = 0
 
-        # Use BFS to find shortest path cost from bot to closest crew member
+        # Use BFS to find shortest path cost from bot to all cells
         while len(bfs_queue) > 0:
             curr_cell = bfs_queue.pop(0)
 
@@ -255,15 +255,6 @@ def crew_sensor(grid, bot, alpha, d_lookup_table, crew_list):
 
             for neighbor in neighbors:
                 if grid[neighbor[0], neighbor[1]] != 1 and neighbor not in seen_cells:
-                    if grid[neighbor[0], neighbor[1]] == 4: # Case where closest crew member is found
-                        d_dict[neighbor[0], neighbor[1]] = d_dict[curr_cell[0], curr_cell[1]] + 1
-                        d = d_dict[neighbor[0], neighbor[1]] # Distance to crew member = distance to crew neighbor + 1
-                        d_lookup_table[bot] = d_dict
-                        # print("D: ", d)
-                        prob = math.exp(-alpha * (d - 1))
-                        print("1")
-                        return np.random.choice([True, False], p=[prob, 1 - prob]), d_lookup_table # Beep with the specified probability
-
                     seen_cells.add(neighbor)
                     bfs_queue.append(neighbor)
                     d_dict[neighbor[0], neighbor[1]] = d_dict[curr_cell[0], curr_cell[1]] + 1 # Set distance of neighbor to current cell's distance + 1
@@ -272,14 +263,18 @@ def crew_sensor(grid, bot, alpha, d_lookup_table, crew_list):
     else:
         d_dict = d_lookup_table[bot]
 
-        for crew_member in crew_list:
-            if d_dict[crew_member] != None:
-                d = d_dict[crew_member]
-                prob = math.exp(-alpha * (d - 1))
-                print("2")
-                return np.random.choice([True, False], p=[prob, 1 - prob]), d_lookup_table # Beep with the specified probability
+    d_min = 2501
 
-    return False, d_lookup_table # Crew member not found, so no beep
+    # Find d for closest crew member
+    for crew_member in crew_list:
+        if d_dict[crew_member] < d_min:
+            d_min = d_dict[crew_member]
+    
+    if d_min == 2501:
+        return False, d_lookup_table # Don't beep if no crew member found
+
+    prob = math.exp(-alpha * (d_min - 1))
+    return np.random.choice([True, False], p=[prob, 1 - prob]), d_lookup_table # Beep with the specified probability
 
 # # Determine shortest path (Constructs 2D array that keep track of the coordinates of the cells that can be reach a certain cell, Stop when crew coordinates reached)    
 # def BFS(bot, crew, board, aliens):
