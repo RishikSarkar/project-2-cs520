@@ -334,8 +334,8 @@ def update_crewmatrix(crew_matrix, detected, d_lookup_table, bot, alpha):
     return crew_matrix
 
 def move_bot(grid, bot, alien_matrix, crew_matrix):
-    neigbors = check_valid_neighbors(len(grid), bot[0], bot[1])
-    open_moves = [neigh for neigh in neigbors if grid[neigh] == 0]
+    neighbors = check_valid_neighbors(len(grid), bot[0], bot[1])
+    open_moves = [neigh for neigh in neighbors if grid[neigh] == 0]
     zero_alienprob = [move for move in open_moves if alien_matrix[move] == 0]
     determined_move = None
     if zero_alienprob:
