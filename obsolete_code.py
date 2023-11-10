@@ -56,3 +56,12 @@
 # win_count = 0
 # bot, crew_list, ship, open_cells, win_count = move_bot(ship, bot, crew_list[0], crew_list, open_cells, win_count)
 # print(f"Ship: {ship}\nBot: {bot}\nCrew: {crew_list}\nOpen Cells: {bot in open_cells}\nWin Count: {win_count}")
+
+# _, d_lookup_table = crew_sensor(ship, (bot[0], bot[1]), 0.1, d_lookup_table, crew_list)
+# print(d_lookup_table)
+
+# _, d_lookup_table = crew_sensor(ship, (bot[0], bot[1] + 1), 0.1, d_lookup_table, crew_list)
+# print(d_lookup_table)
+
+# _, d_lookup_table = crew_sensor(ship, (bot[0], bot[1]), 0.1, d_lookup_table, crew_list)
+# print(d_lookup_table)

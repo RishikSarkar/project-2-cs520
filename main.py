@@ -206,33 +206,80 @@ def alien_sensor(alien_list, bot, k):
 
     return False
 
-# Sensor to detect distance d to closest crew member and beep with probability exp(-alpha * (d - 1))
-def crew_sensor(grid, bot, alpha):
-    d_map = np.full((50, 50), 100)
-    seen_cells = set()
-    bfs_queue = []
-    bfs_queue.append(bot)
-    seen_cells.add(bot)
-    d_map[bot[0], bot[1]] = 0
+# # Sensor to detect distance d to closest crew member and beep with probability exp(-alpha * (d - 1))
+# def crew_sensor(grid, bot, alpha):
+#     d_map = np.full((50, 50), 100)
+#     seen_cells = set()
+#     bfs_queue = []
+#     bfs_queue.append(bot)
+#     seen_cells.add(bot)
+#     d_map[bot[0], bot[1]] = 0
 
-    # Use BFS to find shortest path cost from bot to closest crew member
-    while len(bfs_queue) > 0:
-        curr_cell = bfs_queue.pop(0)
+#     # Use BFS to find shortest path cost from bot to closest crew member
+#     while len(bfs_queue) > 0:
+#         curr_cell = bfs_queue.pop(0)
 
-        neighbors = check_valid_neighbors(50, curr_cell[0], curr_cell[1])
+#         neighbors = check_valid_neighbors(50, curr_cell[0], curr_cell[1])
 
-        for neighbor in neighbors:
-            if grid[neighbor[0], neighbor[1]] != 1 and neighbor not in seen_cells:
-                if grid[neighbor[0], neighbor[1]] == 4: # Case where closest crew member is found
-                    d = d_map[curr_cell[0], curr_cell[1]] + 1 # Distance to crew member = distance to crew neighbor + 1
-                    prob = math.exp(-alpha * (d - 1))
-                    return np.random.choice([True, False], p=[prob, 1 - prob]) # Beep with the specified probability
+#         for neighbor in neighbors:
+#             if grid[neighbor[0], neighbor[1]] != 1 and neighbor not in seen_cells:
+#                 if grid[neighbor[0], neighbor[1]] == 4: # Case where closest crew member is found
+#                     d = d_map[curr_cell[0], curr_cell[1]] + 1 # Distance to crew member = distance to crew neighbor + 1
+#                     print("D: ", d)
+#                     prob = math.exp(-alpha * (d - 1))
+#                     return np.random.choice([True, False], p=[prob, 1 - prob]) # Beep with the specified probability
 
-                seen_cells.add(neighbor)
-                bfs_queue.append(neighbor)
-                d_map[neighbor[0], neighbor[1]] = d_map[curr_cell[0], curr_cell[1]] + 1 # Set distance of neighbor to current cell's distance + 1
+#                 seen_cells.add(neighbor)
+#                 bfs_queue.append(neighbor)
+#                 d_map[neighbor[0], neighbor[1]] = d_map[curr_cell[0], curr_cell[1]] + 1 # Set distance of neighbor to current cell's distance + 1
 
-    return False # Crew member not found, so no beep
+#     return False # Crew member not found, so no beep
+
+# Updated Crew Sensor to avoid having to run BFS every step
+def crew_sensor(grid, bot, alpha, d_lookup_table, crew_list):
+    d_dict = {}
+
+    # Case in which bot has never been to cell before
+    if d_lookup_table.get(bot) == None:
+        seen_cells = set()
+        bfs_queue = []
+        bfs_queue.append(bot)
+        seen_cells.add(bot)
+        d_dict[bot[0], bot[1]] = 0
+
+        # Use BFS to find shortest path cost from bot to closest crew member
+        while len(bfs_queue) > 0:
+            curr_cell = bfs_queue.pop(0)
+
+            neighbors = check_valid_neighbors(50, curr_cell[0], curr_cell[1])
+
+            for neighbor in neighbors:
+                if grid[neighbor[0], neighbor[1]] != 1 and neighbor not in seen_cells:
+                    if grid[neighbor[0], neighbor[1]] == 4: # Case where closest crew member is found
+                        d_dict[neighbor[0], neighbor[1]] = d_dict[curr_cell[0], curr_cell[1]] + 1
+                        d = d_dict[neighbor[0], neighbor[1]] # Distance to crew member = distance to crew neighbor + 1
+                        d_lookup_table[bot] = d_dict
+                        # print("D: ", d)
+                        prob = math.exp(-alpha * (d - 1))
+                        print("1")
+                        return np.random.choice([True, False], p=[prob, 1 - prob]), d_lookup_table # Beep with the specified probability
+
+                    seen_cells.add(neighbor)
+                    bfs_queue.append(neighbor)
+                    d_dict[neighbor[0], neighbor[1]] = d_dict[curr_cell[0], curr_cell[1]] + 1 # Set distance of neighbor to current cell's distance + 1
+
+    # Case in which bot has been to cell before (and knows distance to closest crew member)
+    else:
+        d_dict = d_lookup_table[bot]
+
+        for crew_member in crew_list:
+            if d_dict[crew_member] != None:
+                d = d_dict[crew_member]
+                prob = math.exp(-alpha * (d - 1))
+                print("2")
+                return np.random.choice([True, False], p=[prob, 1 - prob]), d_lookup_table # Beep with the specified probability
+
+    return False, d_lookup_table # Crew member not found, so no beep
 
 # # Determine shortest path (Constructs 2D array that keep track of the coordinates of the cells that can be reach a certain cell, Stop when crew coordinates reached)    
 # def BFS(bot, crew, board, aliens):
@@ -313,7 +360,7 @@ def update_alienmatrix(alien_matrix, detected, bot, k):
         # Cells outside detection square should have probability  0
         detection_cells = [key for key in alien_matrix if not (((key[0] >= (bot[0]-k)) and (key[0] <= (bot[0]+k))) and ((key[1] >= (bot[1]-k)) and (key[1] <= (bot[1]+k))))] 
         for cell in detection_cells:
-            new_prob = { cell: 0}
+            new_prob = { cell: 0 }
             alien_matrix.update(new_prob)
         in_square_cells = alien_matrix.keys() - detection_cells
         sum = 0
@@ -338,6 +385,7 @@ def update_alienmatrix(alien_matrix, detected, bot, k):
 
 #Update probabilties for crew matrix based on beep
 def update_crewmatrix(crew_matrix, detected, bot, alpha):
+
     return None
 
 # # Based on suggestion from Professor's latest announcement (Havent actually used in the Bot code)
@@ -431,15 +479,18 @@ bot, ship = place_bot(ship, open_cells)
 crew_list = []
 alien_list = []
 
+d_lookup_table = {}
+
 crew_list, ship = place_crew(ship, open_cells, crew_list)
 crew_list, ship = place_crew(ship, open_cells, crew_list)
 
 alien_list, ship = place_alien(ship, open_cells, alien_list, bot, 1)
 
 print(f"Ship: {ship}\nBot: {bot}\nCrew: {crew_list}\nAliens: {alien_list}\n")
-print(f"Alien Sensor: {alien_sensor(alien_list, bot, 5)}\nCrew Sensor: {crew_sensor(ship, bot, 0.1)}\n")
+print(f"Alien Sensor: {alien_sensor(alien_list, bot, 5)}\nCrew Sensor: {crew_sensor(ship, bot, 0.1, d_lookup_table, crew_list)}\n")
 
 marker, alien_list, ship = move_aliens(ship, alien_list, bot)
 print(f"Ship: {ship}\nBot: {bot}\nCrew: {crew_list}\nAliens: {alien_list}\nMarker: {marker}\n")
 
 Bot1(ship, open_cells, alien_list, crew_list, bot, 2, 2)
+
