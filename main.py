@@ -439,20 +439,48 @@ def update_afterbotmove(bot, alien_matrix, crew_matrix):
 
 # Determine the best neighboring cell for the bot to move to based on probability matrices
 def determine_move(moves, alien_matrix, crew_matrix):
-    
     zero_alienprob = [move for move in moves if alien_matrix[move] == 0]
-    max_crewprob = -1
-    for cell in moves:
-        if crew_matrix[cell] > max_crewprob:
-            max_crewprob = crew_matrix[cell]
-   
-    chosen_move = None
-    if not zero_alienprob:
-        chosen_move = random.choice(moves)
+    nonzero_crewprob = [move for move in moves if crew_matrix[move] != 0]
+
+    def find_max_prob_cell(cell_list, matrix):
+        max_prob = -1
+        candidates = []
+        for cell in cell_list:
+            current_prob = matrix[cell]
+
+            # Find max probability cell
+            if current_prob > max_prob:
+                max_prob = current_prob
+                candidates = [cell] # Reset list of highest probability cells if new max found
+            elif current_prob == max_prob:
+                candidates.append(cell) # Add cell to list if same probability as max
+
+        return random.choice(candidates) if candidates else None
+
+    # Case at least one move with 0 alien probability
+    if zero_alienprob:
+        chosen_move = find_max_prob_cell(zero_alienprob, crew_matrix)
+    # Case where at least one move with nonzero crew probability
+    elif nonzero_crewprob:
+        chosen_move = find_max_prob_cell(nonzero_crewprob, crew_matrix)
     else:
-        chosen_move = random.choice(zero_alienprob)
-    
+        chosen_move = random.choice(moves)
+
     return chosen_move
+
+    # zero_alienprob = [move for move in moves if alien_matrix[move] == 0]
+    # max_crewprob = -1
+    # for cell in moves:
+    #     if crew_matrix[cell] > max_crewprob:
+    #         max_crewprob = crew_matrix[cell]
+   
+    # chosen_move = None
+    # if not zero_alienprob:
+    #     chosen_move = random.choice(moves)
+    # else:
+    #     chosen_move = random.choice(zero_alienprob)
+    
+    # return chosen_move
 
 # Update probabilities after alien(s) move
 def update_afteralienmove(ship, alien_list, alien_matrix):
@@ -510,14 +538,14 @@ def determine_move_2crew(moves, alien_matrix, crew_matrix, index_mapping):
 
     # Case at least one move with 0 alien probability
     if zero_alienprob:
-        print("0")
+        # print("0")
         chosen_cell = find_max_prob_cell(zero_alienprob)
     # Case at least one move with nonzero crew probability
     elif nonzero_crewprob:
-        print("1")
+        # print("1")
         chosen_cell = find_max_prob_cell(nonzero_crewprob)
     else:
-        print("2")
+        # print("2")
         chosen_cell = find_max_prob_cell(moves)
 
     return chosen_cell
