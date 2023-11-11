@@ -211,7 +211,7 @@ def crew_sensor(grid, bot, alpha, d_lookup_table, crew_list):
                     seen_cells.add(neighbor)
                     bfs_queue.append(neighbor)
                     d_dict[neighbor[0], neighbor[1]] = d_dict[curr_cell[0], curr_cell[1]] + 1 # Set distance of neighbor to current cell's distance + 1
-        d_lookup_table[bot] = d_dict # Forgot this line I think - Aditya
+        d_lookup_table[bot] = d_dict # Forgot this line I think - Aditya (Thanks for adding! - Rishik)
 
     # Case in which bot has been to cell before (and knows distance to closest crew member)
     else:
@@ -232,13 +232,31 @@ def crew_sensor(grid, bot, alpha, d_lookup_table, crew_list):
     return np.random.choice([True, False], p=[prob, 1 - prob]), d_lookup_table # Beep with the specified probability
 
 # Create alien probability matrix (dictionary) for t = 0
-def initialize_alienmatrix(open_cells, bot):
+def initialize_alienmatrix(open_cells, bot, k):
     open_cells.add(bot)
-    # Alien can be at any open cell except the one occupied by the bot
-    inital_prob = [1/(len(open_cells) - 1)] * len(open_cells)
-    alien_matrix = dict(zip(open_cells, inital_prob))
-    bot_cell = {bot : 0}
-    alien_matrix.update(bot_cell)
+
+    bot_x_max = min(bot[0] + k, 49) # k cells to the right of bot
+    bot_x_min = max(0, bot[0] - k) # k cells to the left of bot
+    bot_y_max = min(bot[1] + k, 49) # k cells to the top of bot
+    bot_y_min = max(0, bot[1] - k) # k cells to the bottom of bot
+
+    empty_count = 0
+    for cell in open_cells:
+        if (cell[0] >= bot_x_min and cell[0] <= bot_x_max) and (cell[1] >= bot_y_min and cell[1] <= bot_y_max):
+            empty_count += 1
+
+    # Alien can be at any open cell except the ones occupied by the bot and its detection square
+    initial_prob = [1/(len(open_cells) - empty_count)] * len(open_cells)
+    alien_matrix = dict(zip(open_cells, initial_prob))
+
+    # bot_cell = {bot : 0}
+
+    for cell in open_cells:
+        if (cell[0] >= bot_x_min and cell[0] <= bot_x_max) and (cell[1] >= bot_y_min and cell[1] <= bot_y_max):
+            alien_matrix[cell] = 0
+
+    # alien_matrix.update(bot_cell)
+
     open_cells.remove(bot)
 
     return alien_matrix
@@ -421,7 +439,7 @@ def Bot1(k, alpha):
     crew_list, ship = place_crew(ship, open_cells, crew_list)
     alien_list, ship = place_alien(ship, open_cells, alien_list, bot, k)
 
-    alien_matrix = initialize_alienmatrix(open_cells, bot)
+    alien_matrix = initialize_alienmatrix(open_cells, bot, k)
     crew_matrix = initialize_crewmatrix(open_cells, crew_list, bot)
     win_count = 0
     marker = 0
@@ -436,6 +454,7 @@ def Bot1(k, alpha):
         # next_move = bot # Temporarily set to bot. Must calculate using previous alien_matrix and crew_matrix values
         
         bot, crew_list, ship, open_cells, win_count = move_bot(ship, bot, next_move, crew_list, open_cells, win_count)
+        # print(bot)
        
         alien_matrix, crew_matrix = update_afterbotmove(bot, alien_matrix, crew_matrix)
         # Move bot to optimal neighbor
