@@ -240,27 +240,47 @@ def initialize_alienmatrix(open_cells, bot, k):
     bot_y_max = min(bot[1] + k, 49) # k cells to the top of bot
     bot_y_min = max(0, bot[1] - k) # k cells to the bottom of bot
 
-    empty_count = 0
+    alien_matrix = {}
     for cell in open_cells:
-        if (cell[0] >= bot_x_min and cell[0] <= bot_x_max) and (cell[1] >= bot_y_min and cell[1] <= bot_y_max):
-            empty_count += 1
-
-    # Alien can be at any open cell except the ones occupied by the bot 
-    initial_prob = [1/(len(open_cells) - empty_count)] * len(open_cells)
-    alien_matrix = dict(zip(open_cells, initial_prob))
-    # bot_cell = {bot : 0}
-
-    for cell in open_cells:
-        if (cell[0] >= bot_x_min and cell[0] <= bot_x_max) and (cell[1] >= bot_y_min and cell[1] <= bot_y_max):
+        if bot_x_min <= cell[0] <= bot_x_max and bot_y_min <= cell[1] <= bot_y_max:
             alien_matrix[cell] = 0
+        else:
+            alien_matrix[cell] = 1  # Temporary value, to be normalized later
 
-    # alien_matrix.update(bot_cell)
-
-    
-    
-    open_cells.remove(bot)
+    # Normalize probabilities for cells where the alien can be
+    valid_cells_count = len(open_cells) - sum(value == 0 for value in alien_matrix.values())
+    for cell, prob in alien_matrix.items():
+        if prob != 0:
+            alien_matrix[cell] = 1 / valid_cells_count
 
     return alien_matrix
+
+    # open_cells.add(bot)
+
+    # bot_x_max = min(bot[0] + k, 49) # k cells to the right of bot
+    # bot_x_min = max(0, bot[0] - k) # k cells to the left of bot
+    # bot_y_max = min(bot[1] + k, 49) # k cells to the top of bot
+    # bot_y_min = max(0, bot[1] - k) # k cells to the bottom of bot
+
+    # empty_count = 0
+    # for cell in open_cells:
+    #     if (cell[0] >= bot_x_min and cell[0] <= bot_x_max) and (cell[1] >= bot_y_min and cell[1] <= bot_y_max):
+    #         empty_count += 1
+
+    # # Alien can be at any open cell except the ones occupied by the bot 
+    # initial_prob = [1/(len(open_cells) - empty_count)] * len(open_cells)
+    # alien_matrix = dict(zip(open_cells, initial_prob))
+    # # bot_cell = {bot : 0}
+
+    # for cell in open_cells:
+    #     if (cell[0] >= bot_x_min and cell[0] <= bot_x_max) and (cell[1] >= bot_y_min and cell[1] <= bot_y_max):
+    #         alien_matrix[cell] = 0
+
+    # # alien_matrix.update(bot_cell)
+
+    # open_cells.remove(bot)
+
+    # return alien_matrix
 
 # Create crew probability matrix (dictionary) for t = 0
 def initialize_crewmatrix(open_cells, crew_list, bot):
@@ -276,32 +296,61 @@ def initialize_crewmatrix(open_cells, crew_list, bot):
 
 # Update probabilties for alien matrix based on detection 
 def update_alienmatrix(alien_matrix, detected, bot, k):
+    alien_keys = set(alien_matrix.keys())
+
     if detected:
         # Cells outside detection square should have probability 0
-        out_detection_cells = [key for key in alien_matrix if not (((key[0] >= (bot[0]-k)) and (key[0] <= (bot[0]+k))) and ((key[1] >= (bot[1]-k)) and (key[1] <= (bot[1]+k))))] 
+        out_detection_cells = {key for key in alien_keys if not ((bot[0]-k <= key[0] <= bot[0]+k) and (bot[1]-k <= key[1] <= bot[1]+k))}
         for cell in out_detection_cells:
-            new_prob = { cell: 0 }
-            alien_matrix.update(new_prob)
-        in_square_cells = alien_matrix.keys() - out_detection_cells
-        sum = 0
-        for cell in in_square_cells:
-            sum = sum + alien_matrix[cell]
-        for cell in in_square_cells:
-            alien_matrix.update({cell : alien_matrix[cell] * (1/sum)})
+            alien_matrix[cell] = 0
+
+        # Normalize probabilities inside detection square
+        in_detection_cells = alien_keys - out_detection_cells
+        prob_sum = sum(alien_matrix[cell] for cell in in_detection_cells)
+        if prob_sum != 0:
+            for cell in in_detection_cells:
+                alien_matrix[cell] /= prob_sum
     else:
-        # Cells inside detection square show have probability 0
-        detection_cells = [key for key in alien_matrix if (((key[0] >= (bot[0]-k)) and (key[0] <= (bot[0]+k))) and ((key[1] >= (bot[1]-k)) and (key[1] <= (bot[1]+k))))]
+        # Cells inside detection square should have probability 0
+        detection_cells = {key for key in alien_keys if (bot[0]-k <= key[0] <= bot[0]+k) and (bot[1]-k <= key[1] <= bot[1]+k)}
         for cell in detection_cells:
-            new_prob = { cell: 0}
-            alien_matrix.update(new_prob)
-        outside_cells = alien_matrix.keys() - detection_cells
-        sum = 0
-        for cell in outside_cells:
-            sum = sum + alien_matrix[cell]
-        for cell in outside_cells:
-            alien_matrix.update({cell : alien_matrix[cell] * (1/sum)})
+            alien_matrix[cell] = 0
+
+        # Normalize probabilities outside detection square
+        outside_cells = alien_keys - detection_cells
+        prob_sum = sum(alien_matrix[cell] for cell in outside_cells)
+        if prob_sum != 0:
+            for cell in outside_cells:
+                alien_matrix[cell] /= prob_sum
 
     return alien_matrix
+
+    # if detected:
+    #     # Cells outside detection square should have probability 0
+    #     out_detection_cells = [key for key in alien_matrix if not (((key[0] >= (bot[0]-k)) and (key[0] <= (bot[0]+k))) and ((key[1] >= (bot[1]-k)) and (key[1] <= (bot[1]+k))))] 
+    #     for cell in out_detection_cells:
+    #         new_prob = { cell: 0 }
+    #         alien_matrix.update(new_prob)
+    #     in_square_cells = alien_matrix.keys() - out_detection_cells
+    #     sum = 0
+    #     for cell in in_square_cells:
+    #         sum = sum + alien_matrix[cell]
+    #     for cell in in_square_cells:
+    #         alien_matrix.update({cell : alien_matrix[cell] * (1/sum)})
+    # else:
+    #     # Cells inside detection square show have probability 0
+    #     detection_cells = [key for key in alien_matrix if (((key[0] >= (bot[0]-k)) and (key[0] <= (bot[0]+k))) and ((key[1] >= (bot[1]-k)) and (key[1] <= (bot[1]+k))))]
+    #     for cell in detection_cells:
+    #         new_prob = { cell: 0}
+    #         alien_matrix.update(new_prob)
+    #     outside_cells = alien_matrix.keys() - detection_cells
+    #     sum = 0
+    #     for cell in outside_cells:
+    #         sum = sum + alien_matrix[cell]
+    #     for cell in outside_cells:
+    #         alien_matrix.update({cell : alien_matrix[cell] * (1/sum)})
+
+    # return alien_matrix
 
 # Update probabilties for crew matrix based on beep
 def update_crewmatrix(crew_matrix, detected, d_lookup_table, bot, alpha):
@@ -937,7 +986,7 @@ def Bot6(k, alpha):
 
 # Testing Area
 
-# Bot1(3, 0.3)
+Bot1(3, 0.3)
 # Bot3(3, 0.3)
+# Bot4(3, 0.3)
 # Bot6(3, 0.3)
-Bot4(3,0.3)
