@@ -429,7 +429,7 @@ def Bot1(k, alpha):
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         #TODO: Logic to calculate best neighbor to move to (based on min alien probability and max crew probability) 
-        open_moves.append(bot)
+        open_moves.append(bot) #Bot can stay in place 
         next_move = determine_move(open_moves, alien_matrix, crew_matrix)
 
         
@@ -447,7 +447,7 @@ def Bot1(k, alpha):
         
         alien_detected = alien_sensor(alien_list, bot, k) # Run Alien Sensor
         crew_detected, d_lookup_table = crew_sensor(ship, bot, alpha, d_lookup_table, crew_list) # Run Crew Sensor
-        print(alien_detected)
+        #print(alien_detected)
         alien_matrix = update_alienmatrix(alien_matrix, alien_detected, bot, k) # Update based on alien censor 
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew censor 
