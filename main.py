@@ -429,7 +429,6 @@ def initialize_crewmatrix_2crew(grid, open_cells):
 # Determine the best neighboring cell for the bot to move to based on probability matrices
 def determine_move_2crew(moves, alien_matrix, crew_matrix):
     
-    
     zero_alienprob = [move for move in moves if alien_matrix[move] == 0]
     chosen_cell = None
     if not zero_alienprob:
@@ -464,6 +463,7 @@ def determine_move_2crew(moves, alien_matrix, crew_matrix):
     #     chosen_move = random.choice(zero_alienprob)
     
     return chosen_cell
+
 def update_afterbotmove_2crew(bot, alien_matrix, crew_matrix):
     # Prior Probability alien not in current cell
     alienprob_not = 1 - alien_matrix[bot]
@@ -530,6 +530,9 @@ def update_crewmatrix_2crew(crew_matrix, detected, d_lookup_table, bot, alpha, g
         crew_matrix = crew_matrix / total_summation # Normalize probabilities
 
     return crew_matrix
+
+
+
 
 
 # 1 crew 1 alien bot 
