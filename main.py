@@ -618,12 +618,12 @@ def determine_move_bot5(moves, alien_matrix, crew_matrix, index_mapping, crew_li
     # Find the general quadrant in which the closest crew lies (if d_dict is not available, find relative position of first crew in crew_list)
     up = down = left = right = False
 
-    if closest_crew[0] > bot[0]:
+    if closest_crew[0] >= bot[0]:
         down = True
     else:
         up = True
 
-    if closest_crew[1] > bot[1]:
+    if closest_crew[1] >= bot[1]:
         right = True
     else:
         left = True
@@ -646,7 +646,7 @@ def determine_move_bot5(moves, alien_matrix, crew_matrix, index_mapping, crew_li
         # Filter out the cells that are in the direction of the nearest crew member
         direction_filtered_candidates = []
         for cell in candidates:
-            if (up and cell[0] < bot[0]) or (down and cell[0] > bot[0]) or (left and cell[1] < bot[1]) or (right and cell[1] > bot[1]):
+            if (up and cell[0] <= bot[0]) or (down and cell[0] >= bot[0]) or (left and cell[1] <= bot[1]) or (right and cell[1] >= bot[1]):
                 direction_filtered_candidates.append(cell)
 
         # Return a random neighbor out of filtered candidates if found
@@ -837,7 +837,7 @@ def Bot1(k, alpha, max_iter, timeout):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter and move < timeout:
+    while (win_count + loss_count) < max_iter:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -847,7 +847,7 @@ def Bot1(k, alpha, max_iter, timeout):
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 1)
         move += 1
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -881,7 +881,7 @@ def Bot1(k, alpha, max_iter, timeout):
         # Move bot to optimal neighbor
         marker, alien_list, ship = move_aliens(ship, alien_list, bot) # Move alien randomly
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -938,7 +938,7 @@ def Bot2(k, alpha, max_iter, timeout):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter and move < timeout:
+    while (win_count + loss_count) < max_iter:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -948,7 +948,7 @@ def Bot2(k, alpha, max_iter, timeout):
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 2)
         move += 1
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -983,7 +983,7 @@ def Bot2(k, alpha, max_iter, timeout):
         # Move bot to optimal neighbor
         marker, alien_list, ship = move_aliens(ship, alien_list, bot) # Move alien randomly
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1042,7 +1042,7 @@ def Bot3(k, alpha, max_iter, timeout):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter and move < timeout:
+    while (win_count + loss_count) < max_iter:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1052,7 +1052,7 @@ def Bot3(k, alpha, max_iter, timeout):
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 3)
         move += 1
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1088,7 +1088,7 @@ def Bot3(k, alpha, max_iter, timeout):
         # Move bot to optimal neighbor
         marker, alien_list, ship = move_aliens(ship, alien_list, bot) # Move alien randomly
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1149,7 +1149,7 @@ def Bot4(k, alpha, max_iter, timeout):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter and move < timeout:
+    while (win_count + loss_count) < max_iter:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1159,7 +1159,7 @@ def Bot4(k, alpha, max_iter, timeout):
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 4)
         move += 1
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1195,7 +1195,7 @@ def Bot4(k, alpha, max_iter, timeout):
         # Move bot to optimal neighbor
         marker, alien_list, ship = move_aliens(ship, alien_list, bot) # Move alien randomly
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1256,7 +1256,7 @@ def Bot5(k, alpha, max_iter, timeout):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter and move < timeout:
+    while (win_count + loss_count) < max_iter:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1266,7 +1266,7 @@ def Bot5(k, alpha, max_iter, timeout):
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 5)
         move += 1
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1302,7 +1302,7 @@ def Bot5(k, alpha, max_iter, timeout):
         # Move bot to optimal neighbor
         marker, alien_list, ship = move_aliens(ship, alien_list, bot) # Move alien randomly
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1364,7 +1364,7 @@ def Bot6(k, alpha, max_iter, timeout):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter and move < timeout:
+    while (win_count + loss_count) < max_iter:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1374,7 +1374,7 @@ def Bot6(k, alpha, max_iter, timeout):
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 6)
         move += 1
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1411,7 +1411,7 @@ def Bot6(k, alpha, max_iter, timeout):
         # Move bot to optimal neighbor
         marker, alien_list, ship = move_aliens(ship, alien_list, bot) # Move alien randomly
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1474,7 +1474,7 @@ def Bot7(k, alpha, max_iter, timeout):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter and move < timeout:
+    while (win_count + loss_count) < max_iter:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1485,7 +1485,7 @@ def Bot7(k, alpha, max_iter, timeout):
        
         move += 1
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1522,7 +1522,7 @@ def Bot7(k, alpha, max_iter, timeout):
         # Move bot to optimal neighbor
         marker, alien_list, ship = move_aliens(ship, alien_list, bot) # Move alien randomly
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1586,7 +1586,7 @@ def Bot8(k, alpha, max_iter, timeout):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter and move < timeout:
+    while (win_count + loss_count) < max_iter:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1596,7 +1596,7 @@ def Bot8(k, alpha, max_iter, timeout):
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 8)
         move += 1
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
@@ -1633,7 +1633,7 @@ def Bot8(k, alpha, max_iter, timeout):
         # Move bot to optimal neighbor
         marker, alien_list, ship = move_aliens(ship, alien_list, bot) # Move alien randomly
 
-        if marker == 1:
+        if marker == 1 or move < timeout:
             loss_count += 1
             print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
 
