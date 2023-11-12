@@ -453,3 +453,42 @@
 #     open_cells.remove(bot)
 
 #     return alien_matrix
+
+# # Update probabilties for crew matrix based on beep
+# def update_crewmatrix_2crew(crew_matrix, detected, d_lookup_table, bot, alpha, index_mapping, open_cells):
+#     reverse_index_mapping = {index: cell for cell, index in index_mapping.items()}
+
+#     # Case where beep is detected from bot cell
+#     if detected:
+#         total_summation = 0
+#         for i in range(len(crew_matrix)):
+#             for j in range(len(crew_matrix)):
+#                 cell_i = reverse_index_mapping[i]
+#                 cell_j = reverse_index_mapping[j]
+#                 if grid[cell_i[0], cell_i[1]] == 0 and grid[cell_j[0], cell_j[1]] == 0:
+#                     di = d_dict.get(cell_i)
+#                     dj = d_dict.get(cell_j)
+#                     if (cell_i == bot) or (cell_j == bot):
+#                         crew_matrix[i, j] = 0
+#                     else:
+#                         crew_matrix[i, j] *= (1 - ((1 - math.exp(-alpha * (di - 1))) * (1 - math.exp(-alpha * (dj - 1))))) # Multiply probability of cell containing crew by given prob
+#                     total_summation += crew_matrix[i, j] # Calculate sum of all probabilities
+#         crew_matrix = crew_matrix / total_summation # Normalize probabilities
+#     # Case where beep is not detected from bot cell
+#     else:
+#         total_summation = 0
+#         for i in range(len(crew_matrix)):
+#             for j in range(len(crew_matrix)):
+#                 cell_i = reverse_index_mapping[i]
+#                 cell_j = reverse_index_mapping[j]
+#                 if grid[cell_i[0], cell_i[1]] == 0 and grid[cell_j[0], cell_j[1]] == 0:
+#                     di = d_dict.get(cell_i)
+#                     dj = d_dict.get(cell_j)
+#                     if (cell_i == bot) or (cell_j == bot):
+#                         crew_matrix[i, j] = 0
+#                     else:
+#                         crew_matrix[i, j] *= ((1 - math.exp(-alpha * (di - 1))) * (1 - math.exp(-alpha * (dj - 1)))) # Multiply probability of cell containing crew by given prob
+#                     total_summation += crew_matrix[i, j] # Calculate sum of all probabilities
+#         crew_matrix = crew_matrix / total_summation # Normalize probabilities
+
+#     return crew_matrix

@@ -1,15 +1,15 @@
 import numpy as np
 import random
 import math
-np.set_printoptions(threshold=np.inf) # Use this to see full 50x50 numpy matrix
+np.set_printoptions(threshold=np.inf) # Use this to see full 30x30 numpy matrix
 np.set_printoptions(linewidth=1000) # Use this to fit each row in a single line without breaks
 
 # Function to find current open cells in grid
 def find_all_open_cells(grid):
     open_cells = set()
 
-    for i in range(50):
-        for j in range(50):
+    for i in range(30):
+        for j in range(30):
             if grid[i, j] == 0:
                 open_cells.add((i, j))
 
@@ -19,11 +19,11 @@ def find_all_open_cells(grid):
 def single_open_neighbor_check(i, j, grid):
     count = 0
 
-    if (i + 1 < 50) and (grid[i + 1, j] == 0):
+    if (i + 1 < 30) and (grid[i + 1, j] == 0):
         count += 1
     if (i - 1 >= 0) and (grid[i - 1, j] == 0):
         count += 1
-    if (j + 1 < 50) and (grid[i, j + 1] == 0):
+    if (j + 1 < 30) and (grid[i, j + 1] == 0):
         count += 1
     if (j - 1 >= 0) and (grid[i, j - 1] == 0):
         count += 1
@@ -35,8 +35,8 @@ def open_random_single_neighbor_cell(grid, num_open_neighbor_cells):
     open_neighbor_cells = set()
 
     # Find open neighbor cells
-    for i in range(50):
-        for j in range(50):
+    for i in range(30):
+        for j in range(30):
             if (grid[i, j] == 1) and (single_open_neighbor_check(i, j, grid)):
                 open_neighbor_cells.add((i, j))
     
@@ -57,11 +57,11 @@ def open_random_single_neighbor_cell(grid, num_open_neighbor_cells):
 def open_random_closed_neighbor(i, j, grid):
     closed_neighbors = set()
 
-    if (i + 1 < 50) and (grid[i + 1, j] == 1):
+    if (i + 1 < 30) and (grid[i + 1, j] == 1):
         closed_neighbors.add((i + 1, j))
     if (i - 1 >= 0) and (grid[i - 1, j] == 1):
         closed_neighbors.add((i - 1, j))
-    if (j + 1 < 50) and (grid[i, j + 1] == 1):
+    if (j + 1 < 30) and (grid[i, j + 1] == 1):
         closed_neighbors.add((i, j + 1))
     if (j - 1 >= 0) and (grid[i, j - 1] == 1):
         closed_neighbors.add((i, j - 1))
@@ -72,12 +72,12 @@ def open_random_closed_neighbor(i, j, grid):
 
     return grid
 
-# Function to create an empty 50x50 grid
+# Function to create an empty 30x30 grid
 def create_grid():
-    grid = np.full((50, 50), 1) # Create a new 50x50 numpy matrix (2D array)
-    grid[random.randrange(1, 49), random.randrange(1, 49)] = 0 # Open a random blocked cell (except on edges and corners)
+    grid = np.full((30, 30), 1) # Create a new 30x30 numpy matrix (2D array)
+    grid[random.randrange(1, 29), random.randrange(1, 29)] = 0 # Open a random blocked cell (except on edges and corners)
 
-    num_open_neighbor_cells = 2500
+    num_open_neighbor_cells = 900
 
     # Iteratively open all single open neighbor cells
     while (num_open_neighbor_cells > 0):
@@ -86,8 +86,8 @@ def create_grid():
     dead_end_cells = set()
 
     # Find dead-end cells
-    for i in range(50):
-        for j in range(50):
+    for i in range(30):
+        for j in range(30):
             if (grid[i, j] == 0) and (single_open_neighbor_check(i, j, grid)):
                 dead_end_cells.add((i, j))
 
@@ -147,7 +147,7 @@ def check_valid_neighbors(dim, x_coord, y_coord):
 
 # Move aliens randomly to adjacent cells
 def move_aliens(grid, alien_list, bot):
-    random.shuffle(alien_list)
+    # random.shuffle(alien_list)
     new_position = []
     marker = 0
     for alien in alien_list:
@@ -176,9 +176,9 @@ def move_aliens(grid, alien_list, bot):
 
 # Sensor to detect aliens within a (2k + 1) x (2k + 1) square around bot
 def alien_sensor(alien_list, bot, k):
-    bot_x_max = min(bot[0] + k, 49) # k cells to the right of bot
+    bot_x_max = min(bot[0] + k, 29) # k cells to the right of bot
     bot_x_min = max(0, bot[0] - k) # k cells to the left of bot
-    bot_y_max = min(bot[1] + k, 49) # k cells to the top of bot
+    bot_y_max = min(bot[1] + k, 29) # k cells to the top of bot
     bot_y_min = max(0, bot[1] - k) # k cells to the bottom of bot
 
     # Check if each alien is within the detection square
@@ -204,7 +204,7 @@ def crew_sensor(grid, bot, alpha, d_lookup_table, crew_list):
         while len(bfs_queue) > 0:
             curr_cell = bfs_queue.pop(0)
 
-            neighbors = check_valid_neighbors(50, curr_cell[0], curr_cell[1])
+            neighbors = check_valid_neighbors(30, curr_cell[0], curr_cell[1])
 
             for neighbor in neighbors:
                 if grid[neighbor[0], neighbor[1]] != 1 and neighbor not in seen_cells:
@@ -217,14 +217,14 @@ def crew_sensor(grid, bot, alpha, d_lookup_table, crew_list):
     else:
         d_dict = d_lookup_table[bot]
 
-    d_min = 2501
+    d_min = 901
 
     # Find d for closest crew member
     for crew_member in crew_list:
         if d_dict[crew_member] < d_min:
             d_min = d_dict[crew_member]
     
-    if d_min == 2501:
+    if d_min == 901:
         return False, d_lookup_table # Don't beep if no crew member found
 
     prob = math.exp(-alpha * (d_min - 1))
@@ -235,9 +235,9 @@ def crew_sensor(grid, bot, alpha, d_lookup_table, crew_list):
 def initialize_alienmatrix(open_cells, bot, k):
     open_cells.add(bot)
 
-    bot_x_max = min(bot[0] + k, 49) # k cells to the right of bot
+    bot_x_max = min(bot[0] + k, 29) # k cells to the right of bot
     bot_x_min = max(0, bot[0] - k) # k cells to the left of bot
-    bot_y_max = min(bot[1] + k, 49) # k cells to the top of bot
+    bot_y_max = min(bot[1] + k, 29) # k cells to the top of bot
     bot_y_min = max(0, bot[1] - k) # k cells to the bottom of bot
 
     alien_matrix = {}
@@ -671,50 +671,15 @@ def update_crewmatrix_2crew(crew_matrix, detected, d_lookup_table, bot, alpha, i
             crew_matrix[:,index_mapping[cell]] *= -1 * (1 - math.exp(-alpha * (d_dict[cell] - 1)))
         crew_matrix = crew_matrix / np.sum(crew_matrix)
 
-    # reverse_index_mapping = {index: cell for cell, index in index_mapping.items()}
-
-    # # Case where beep is detected from bot cell
-    # if detected:
-    #     total_summation = 0
-    #     for i in range(len(crew_matrix)):
-    #         for j in range(len(crew_matrix)):
-    #             cell_i = reverse_index_mapping[i]
-    #             cell_j = reverse_index_mapping[j]
-    #             if grid[cell_i[0], cell_i[1]] == 0 and grid[cell_j[0], cell_j[1]] == 0:
-    #                 di = d_dict.get(cell_i)
-    #                 dj = d_dict.get(cell_j)
-    #                 if (cell_i == bot) or (cell_j == bot):
-    #                     crew_matrix[i, j] = 0
-    #                 else:
-    #                     crew_matrix[i, j] *= (1 - ((1 - math.exp(-alpha * (di - 1))) * (1 - math.exp(-alpha * (dj - 1))))) # Multiply probability of cell containing crew by given prob
-    #                 total_summation += crew_matrix[i, j] # Calculate sum of all probabilities
-    #     crew_matrix = crew_matrix / total_summation # Normalize probabilities
-    # # Case where beep is not detected from bot cell
-    # else:
-    #     total_summation = 0
-    #     for i in range(len(crew_matrix)):
-    #         for j in range(len(crew_matrix)):
-    #             cell_i = reverse_index_mapping[i]
-    #             cell_j = reverse_index_mapping[j]
-    #             if grid[cell_i[0], cell_i[1]] == 0 and grid[cell_j[0], cell_j[1]] == 0:
-    #                 di = d_dict.get(cell_i)
-    #                 dj = d_dict.get(cell_j)
-    #                 if (cell_i == bot) or (cell_j == bot):
-    #                     crew_matrix[i, j] = 0
-    #                 else:
-    #                     crew_matrix[i, j] *= ((1 - math.exp(-alpha * (di - 1))) * (1 - math.exp(-alpha * (dj - 1)))) # Multiply probability of cell containing crew by given prob
-    #                 total_summation += crew_matrix[i, j] # Calculate sum of all probabilities
-    #     crew_matrix = crew_matrix / total_summation # Normalize probabilities
-
     return crew_matrix
 
 
 def initialize_alienmatrix_2alien(open_cells, bot, k):
     open_cells.add(bot)
     
-    bot_x_max = min(bot[0] + k, 49) # k cells to the right of bot
+    bot_x_max = min(bot[0] + k, 29) # k cells to the right of bot
     bot_x_min = max(0, bot[0] - k) # k cells to the left of bot
-    bot_y_max = min(bot[1] + k, 49) # k cells to the top of bot
+    bot_y_max = min(bot[1] + k, 29) # k cells to the top of bot
     bot_y_min = max(0, bot[1] - k) # k cells to the bottom of bot
     
     
@@ -742,8 +707,6 @@ def initialize_alienmatrix_2alien(open_cells, bot, k):
 
 
 # 1 crew 1 alien bot 
-# Notes: (Setup done inside this method, since we are only testing by varying k and alpha values. 
-# Might reuse grid if it takes too long to regenerate for each test)
 def Bot1(k, alpha):
     grid, open_cells = create_grid()
     bot, ship, open_cells = place_bot(grid, open_cells)
@@ -763,12 +726,8 @@ def Bot1(k, alpha):
     while win_count < 1: # Arbitrary temporary win condition for testing
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
-        #TODO: Logic to calculate best neighbor to move to (based on min alien probability and max crew probability) 
-        open_moves.append(bot) #Bot can stay in place 
+        open_moves.append(bot) # Bot can stay in place 
         next_move = determine_move(open_moves, alien_matrix, crew_matrix)
-        print(next_move)
-        
-        # next_move = bot # Temporarily set to bot. Must calculate using previous alien_matrix and crew_matrix values
         
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 1)
 
@@ -777,9 +736,8 @@ def Bot1(k, alpha):
             return False
         
         print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
-        print("----------------------")
+
         alien_matrix, crew_matrix = update_afterbotmove(bot, alien_matrix, crew_matrix)
-        # print(alien_matrix, "\n")
 
         # Move bot to optimal neighbor
         marker, alien_list, ship = move_aliens(ship, alien_list, bot) # Move alien randomly
@@ -789,33 +747,14 @@ def Bot1(k, alpha):
             return False
         
         alien_matrix = update_afteralienmove(ship, alien_list, alien_matrix) # Update after alien move
-        # print(alien_matrix, "\n")
-
-        # If bot is captured, end simulation
-        
         
         alien_detected = alien_sensor(alien_list, bot, k) # Run Alien Sensor
         crew_detected, d_lookup_table = crew_sensor(ship, bot, alpha, d_lookup_table, crew_list) # Run Crew Sensor
-        #print(alien_detected)
+        
         alien_matrix = update_alienmatrix(alien_matrix, alien_detected, bot, k) # Update based on alien censor
-        # print(alien_matrix, "\n\n\n")
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew censor 
-        #print(alien_matrix)
-        # sum = 0
-        # for x in alien_matrix:
-        #     sum = sum + alien_matrix[x]
-        # print("Alien: " + str(sum))
-        # sum1 = 0
-        # for x in crew_matrix:
-        #     sum1 = sum1 + crew_matrix[x]
-        # print("Crew: " + str(sum1))
-        # print("Win count" + str(win_count))
-        #print(alien_matrix)
-        # print(alien_list)
-        # print(bot)
-        
-        #print("-----------")
+
     return True
 
 
@@ -842,10 +781,8 @@ def Bot2(k, alpha):
     while win_count < 1: # Arbitrary temporary win condition for testing
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
-        # Logic to calculate best neighbor to move to (based on min alien probability and max crew probability) 
         open_moves.append(bot) # Bot can stay in place 
         next_move = determine_move_bot2(open_moves, alien_matrix, crew_matrix)
-        print(next_move)
         
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 1)
 
@@ -854,7 +791,7 @@ def Bot2(k, alpha):
             return False
         
         print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
-        print("----------------------")
+
         alien_matrix, crew_matrix = update_afterbotmove(bot, alien_matrix, crew_matrix)
 
         # Move bot to optimal neighbor
@@ -865,7 +802,6 @@ def Bot2(k, alpha):
             return False
         
         alien_matrix = update_afteralienmove(ship, alien_list, alien_matrix) # Update after alien move
-        
         
         alien_detected = alien_sensor(alien_list, bot, k) # Run Alien Sensor
         crew_detected, d_lookup_table = crew_sensor(ship, bot, alpha, d_lookup_table, crew_list) # Run Crew Sensor
@@ -902,9 +838,7 @@ def Bot3(k, alpha):
     while win_count < 2: # Arbitrary temporary win condition for testing
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
-
-        # Logic to calculate best neighbor to move to (based on min alien probability and max crew probability) 
-        open_moves.append(bot) #Bot can stay in place 
+        open_moves.append(bot) # Bot can stay in place 
         next_move = determine_move(open_moves, alien_matrix, crew_matrix)
         
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 1)
@@ -961,9 +895,7 @@ def Bot4(k, alpha):
     while win_count < 2: # Arbitrary temporary win condition for testing
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
-
-        # Logic to calculate best neighbor to move to (based on min alien probability and max crew probability) 
-        open_moves.append(bot) #Bot can stay in place 
+        open_moves.append(bot) # Bot can stay in place 
         next_move = determine_move_2crew(open_moves, alien_matrix, crew_matrix, index_mapping)
         
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 1)
@@ -986,14 +918,12 @@ def Bot4(k, alpha):
         alien_detected = alien_sensor(alien_list, bot, k) # Run Alien Sensor
         
         crew_detected, d_lookup_table = crew_sensor(ship, bot, alpha, d_lookup_table, crew_list) # Run Crew Sensor
-        #print(alien_detected)
         alien_matrix = update_alienmatrix(alien_matrix, alien_detected, bot, k) # Update based on alien censor
-        # print(alien_matrix, "\n\n\n")
 
         crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping, open_cells) # Update based on crew censor
     
     return True
-    
+
 
 
 
@@ -1023,9 +953,7 @@ def Bot6(k, alpha):
     while win_count < 2: # Arbitrary temporary win condition for testing
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
-
-        # Logic to calculate best neighbor to move to (based on min alien probability and max crew probability) 
-        open_moves.append(bot) #Bot can stay in place 
+        open_moves.append(bot) # Bot can stay in place 
         next_move = determine_move(open_moves, alien_matrix, crew_matrix)
         
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 1)
@@ -1046,16 +974,18 @@ def Bot6(k, alpha):
         
         alien_matrix = update_afteralienmove(ship, alien_list, alien_matrix) # Update after alien move
 
-        # If bot is captured, end simulation
-       
-        
         alien_detected = alien_sensor(alien_list, bot, k) # Run Alien Sensor
+
         crew_detected, d_lookup_table = crew_sensor(ship, bot, alpha, d_lookup_table, crew_list) # Run Crew Sensor
         alien_matrix = update_alienmatrix(alien_matrix, alien_detected, bot, k) # Update based on alien censor
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew censor 
 
     return True
+
+
+
+
 
 # 2 crew 2 alien bot
 def Bot7(k, alpha):
@@ -1082,9 +1012,7 @@ def Bot7(k, alpha):
     while win_count < 2: # Arbitrary temporary win condition for testing
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
-
-        # Logic to calculate best neighbor to move to (based on min alien probability and max crew probability) 
-        open_moves.append(bot) #Bot can stay in place 
+        open_moves.append(bot) # Bot can stay in place 
         next_move = determine_move_2crew2alien(open_moves, alien_matrix, crew_matrix, index_mapping_crew)
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 1)
         
@@ -1111,11 +1039,14 @@ def Bot7(k, alpha):
         crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping_crew, open_cells) # Update based on crew censor
 
 
+
+
+
 # Testing Area
 
-# Bot1(3, 0.3)
-#Bot2(3, 0.3)
-# Bot3(3, 0.3)
-# Bot4(3, 0.3)
-#Bot6(3, 0.3)
-Bot7(3,0.3)
+Bot1(3, 0.3)
+Bot2(3, 0.3)
+Bot3(3, 0.3)
+Bot4(3, 0.3)
+Bot6(3, 0.3)
+Bot7(3, 0.3)
