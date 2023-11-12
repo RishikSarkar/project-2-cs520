@@ -238,3 +238,218 @@
 
 # marker, alien_list, ship = move_aliens(ship, alien_list, bot)
 # print(f"Ship: {ship}\nBot: {bot}\nCrew: {crew_list}\nAliens: {alien_list}\nMarker: {marker}\n")
+
+# # Determine the best neighboring cell for the bot to move to based on probability matrices
+# def determine_move(moves, alien_matrix, crew_matrix):
+#     zero_alienprob = [move for move in moves if alien_matrix[move] == 0]
+#     max_crewprob = -1
+#     for cell in moves:
+#         if crew_matrix[cell] > max_crewprob:
+#             max_crewprob = crew_matrix[cell]
+   
+#     chosen_move = None
+#     if not zero_alienprob:
+#         chosen_move = random.choice(moves)
+#     else:
+#         chosen_move = random.choice(zero_alienprob)
+    
+#     return chosen_move
+
+# # Determine the best neighboring cell for the bot to move to based on probability matrices
+# def determine_move_2crew(moves, alien_matrix, crew_matrix, index_mapping):
+
+#     # Case at least one move with 0 alien probability
+#     if zero_alienprob:
+#         print("0")
+#         max_crewprob = -1
+#         for cell in zero_alienprob:
+#             cell_index = index_mapping[cell] # Retrieve index mapping of current cell
+#             current_crewprob = np.sum(crew_matrix[cell_index, :]) + np.sum(crew_matrix[:, cell_index]) # Sum probability of crew in current cell with all other cells
+#             current_crewprob -= crew_matrix[cell_index, cell_index] # Avoid double-counting
+
+#             # Find max probability cell
+#             if current_crewprob > max_crewprob:
+#                 max_crewprob = current_crewprob
+#                 chosen_cell = cell
+#     # Case where at least one move with nonzero crew probability
+#     elif nonzero_crewprob:
+#         print("1")
+#         max_crewprob = -1
+#         for cell in nonzero_crewprob:
+#             cell_index = index_mapping[cell] # Retrieve index mapping of current cell
+#             current_crewprob = np.sum(crew_matrix[cell_index, :]) + np.sum(crew_matrix[:, cell_index]) # Sum probability of crew in current cell with all other cells
+#             current_crewprob -= crew_matrix[cell_index, cell_index] # Avoid double-counting
+
+#             # Find max probability cell
+#             if current_crewprob > max_crewprob:
+#                 max_crewprob = current_crewprob
+#                 chosen_cell = cell
+            
+#             # Add statement for case where there are multiple choices with the same prob, so one is picked at random
+#     else:
+#         print("2")
+#         max_crewprob = -1
+#         for cell in moves:
+#             cell_index = index_mapping[cell] # Retrieve index mapping of current cell
+#             current_crewprob = np.sum(crew_matrix[cell_index, :]) + np.sum(crew_matrix[:, cell_index]) # Sum probability of crew in current cell with all other cells
+#             current_crewprob -= crew_matrix[cell_index, cell_index] # Avoid double-counting
+
+#             # Find max probability cell
+#             if current_crewprob > max_crewprob:
+#                 max_crewprob = current_crewprob
+#                 chosen_cell = cell
+
+#     return chosen_cell
+
+#     # zero_alienprob = [move for move in moves if alien_matrix[move] == 0]
+#     # chosen_cell = None
+#     # if not zero_alienprob:
+#     #     max_crewprob = -1
+        
+#     #     for cell in moves:
+#     #         current_crewprob = 0
+#     #         for i in range(0, crew_matrix.shape[2]):
+#     #             for j in range(0, crew_matrix.shape[3]):
+#     #                 current_crewprob = current_crewprob + crew_matrix[cell[0]][cell[1]][i][j]
+            
+#     #         if current_crewprob > max_crewprob:
+#     #             max_crewprob = current_crewprob
+#     #             chosen_cell = cell 
+            
+#     # else:  
+#     #     max_crewprob = -1
+        
+#     #     for cell in zero_alienprob:
+#     #         current_crewprob = 0
+#     #         for i in range(0, crew_matrix.shape[2]):
+#     #             for j in range(0, crew_matrix.shape[3]):
+#     #                 current_crewprob = current_crewprob + crew_matrix[cell[0]][cell[1]][i][j]
+#     #         if current_crewprob > max_crewprob:
+#     #             max_crewprob = current_crewprob
+#     #             chosen_cell = cell    
+   
+#     # chosen_move = None
+#     # if not zero_alienprob:
+#     #     chosen_move = random.choice(moves)
+#     # else:
+#     #     chosen_move = random.choice(zero_alienprob)
+    
+#     # return chosen_cell
+
+# def update_afterbotmove_2crew(bot, alien_matrix, crew_matrix, index_mapping):
+    
+#     total_sum = 0
+#     for i in range(0, crew_matrix.shape[0]):
+#         for j in range(0, crew_matrix.shape[1]):
+#             for k in range(0, crew_matrix.shape[2]):
+#                 for m in range(0, crew_matrix.shape[3]):
+#                     if ((i, j) == bot) or ((k,m) == bot):
+#                         crew_matrix[i][j][k][m] = 0
+#                     total_sum = total_sum + crew_matrix[i][j][k][m]
+
+#     crew_matrix = crew_matrix / total_sum
+
+#     return alien_matrix, crew_matrix
+
+# # Update probabilties for crew matrix based on beep
+# def update_crewmatrix_2crew(crew_matrix, detected, d_lookup_table, bot, alpha, grid, index_mapping):
+
+#     # Previous Code:
+#     # Case where beep is detected from bot cell
+#     if detected:
+#         d_dict = d_lookup_table.get(bot) # Get the d dictionary calculated with the crew sensor
+#         total_summation = 0
+#         for i in range(0, crew_matrix.shape[0]):
+#             for j in range(0, crew_matrix.shape[1]):
+#                 for k in range(0, crew_matrix.shape[2]):
+#                     for m in range(0, crew_matrix.shape[3]):
+#                         if grid[i][j] == 0 and grid[k][m] == 0:
+#                             d1 = d_dict.get((i,j)) # Find d from bot to cell
+#                             d2 = d_dict.get((k,m)) # Find d from bot to cell
+#                             if ((i,j) == bot) or ((k, m) == bot):
+#                                 crew_matrix[i][j][k][m] = 0 # Crew member not at current cell
+#                             else:
+#                                 crew_matrix[i][j][k][m] *= (1 - ((1-(math.exp(-alpha * (d1 - 1)))) * (1-(math.exp(-alpha * (d2 - 1)))))) # Multiply probability of cell containing crew by given prob
+#                             total_summation += crew_matrix[i][j][k][m] # Calculate sum of all probabilities
+        
+#         crew_matrix = crew_matrix / total_summation # Normalize probabilities
+#     # Case where beep is not detected from bot cell
+#     else:
+#         d_dict = d_lookup_table.get(bot) # Get the d dictionary calculated with the crew sensor
+#         total_summation = 0
+#         for i in range(0, crew_matrix.shape[0]):
+#             for j in range(0, crew_matrix.shape[1]):
+#                 for k in range(0, crew_matrix.shape[2]):
+#                     for m in range(0, crew_matrix.shape[3]):
+#                         if grid[i][j] == 0 and grid[k][m] == 0:
+#                             d1 = d_dict.get((i,j)) # Find d from bot to cell
+#                             d2 = d_dict.get((k,m)) # Find d from bot to cell
+#                             if ((i,j) == bot) or ((k, m) == bot):
+#                                 crew_matrix[i][j][k][m] = 0 # Crew member not at current cell
+#                             else:
+#                                 crew_matrix[i][j][k][m] *= ((1-(math.exp(-alpha * (d1 - 1)))) * (1-(math.exp(-alpha * (d2 - 1))))) # Multiply probability of cell containing crew by given prob
+#                             total_summation += crew_matrix[i][j][k][m] # Calculate sum of all probabilities
+        
+#         crew_matrix = crew_matrix / total_summation # Normalize probabilities
+
+#     return crew_matrix
+
+# # Update probabilties for alien matrix based on detection 
+# def update_alienmatrix(alien_matrix, detected, bot, k):
+
+#     if detected:
+#         # Cells outside detection square should have probability 0
+#         out_detection_cells = [key for key in alien_matrix if not (((key[0] >= (bot[0]-k)) and (key[0] <= (bot[0]+k))) and ((key[1] >= (bot[1]-k)) and (key[1] <= (bot[1]+k))))] 
+#         for cell in out_detection_cells:
+#             new_prob = { cell: 0 }
+#             alien_matrix.update(new_prob)
+#         in_square_cells = alien_matrix.keys() - out_detection_cells
+#         sum = 0
+#         for cell in in_square_cells:
+#             sum = sum + alien_matrix[cell]
+#         for cell in in_square_cells:
+#             alien_matrix.update({cell : alien_matrix[cell] * (1/sum)})
+#     else:
+#         # Cells inside detection square show have probability 0
+#         detection_cells = [key for key in alien_matrix if (((key[0] >= (bot[0]-k)) and (key[0] <= (bot[0]+k))) and ((key[1] >= (bot[1]-k)) and (key[1] <= (bot[1]+k))))]
+#         for cell in detection_cells:
+#             new_prob = { cell: 0}
+#             alien_matrix.update(new_prob)
+#         outside_cells = alien_matrix.keys() - detection_cells
+#         sum = 0
+#         for cell in outside_cells:
+#             sum = sum + alien_matrix[cell]
+#         for cell in outside_cells:
+#             alien_matrix.update({cell : alien_matrix[cell] * (1/sum)})
+
+#     return alien_matrix
+
+# #  Create alien probability matrix (dictionary) for t = 0
+# def initialize_alienmatrix(open_cells, bot, k):
+
+#     open_cells.add(bot)
+
+#     bot_x_max = min(bot[0] + k, 49) # k cells to the right of bot
+#     bot_x_min = max(0, bot[0] - k) # k cells to the left of bot
+#     bot_y_max = min(bot[1] + k, 49) # k cells to the top of bot
+#     bot_y_min = max(0, bot[1] - k) # k cells to the bottom of bot
+
+#     empty_count = 0
+#     for cell in open_cells:
+#         if (cell[0] >= bot_x_min and cell[0] <= bot_x_max) and (cell[1] >= bot_y_min and cell[1] <= bot_y_max):
+#             empty_count += 1
+
+#     # Alien can be at any open cell except the ones occupied by the bot 
+#     initial_prob = [1/(len(open_cells) - empty_count)] * len(open_cells)
+#     alien_matrix = dict(zip(open_cells, initial_prob))
+#     # bot_cell = {bot : 0}
+
+#     for cell in open_cells:
+#         if (cell[0] >= bot_x_min and cell[0] <= bot_x_max) and (cell[1] >= bot_y_min and cell[1] <= bot_y_max):
+#             alien_matrix[cell] = 0
+
+#     # alien_matrix.update(bot_cell)
+
+#     open_cells.remove(bot)
+
+#     return alien_matrix
