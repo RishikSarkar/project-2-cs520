@@ -317,7 +317,7 @@ def update_alienmatrix_2alien(alien_matrix, alien_detected, bot, k, index_mappin
             if ((bot[0]-k <= cell[0] <= bot[0]+k) and (bot[1]-k <= cell[1] <= bot[1]+k)):
                 in_detectionsqaure.append(cell)
         
-        outside_detectionsqaure = open_cells - in_detectionsqaure
+        outside_detectionsqaure = list(open_cells - set(in_detectionsqaure))
         for cell in outside_detectionsqaure:
             for c in outside_detectionsqaure:
                 alien_matrix[index_mapping[cell]][index_mapping[c]] = 0
@@ -333,7 +333,7 @@ def update_alienmatrix_2alien(alien_matrix, alien_detected, bot, k, index_mappin
             if ((bot[0]-k <= cell[0] <= bot[0]+k) and (bot[1]-k <= cell[1] <= bot[1]+k)):
                 in_detectionsqaure.append(cell)
         
-        outside_detectionsqaure = open_cells - in_detectionsqaure
+        outside_detectionsqaure = list(open_cells - set(in_detectionsqaure))
         for cell in in_detectionsqaure:
             alien_matrix[index_mapping[cell]] = 0
             alien_matrix[:, index_mapping[cell]] = 0
