@@ -1838,10 +1838,10 @@ def two_alien_two_crew(alpha_values, k_values, max_iter, timeout):
 # timeout = 5000
 
 alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
-k_values = [3, 5]
-max_iter = 2
+k_values = [1, 3, 5]
+max_iter = 30
 timeout = 10000
 
-# one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
-# one_alien_two_crew(alpha_values, k_values, max_iter, timeout)
+one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
+one_alien_two_crew(alpha_values, k_values, max_iter, timeout)
 two_alien_two_crew(alpha_values, k_values, max_iter, timeout)
