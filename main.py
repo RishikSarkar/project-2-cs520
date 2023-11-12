@@ -601,7 +601,7 @@ def determine_move_2crew(moves, alien_matrix, crew_matrix, index_mapping):
 def determine_move_2crew2alien(moves, alien_matrix, crew_matrix, index_mapping):
     
     zero_alienprob = [move for move in moves if np.sum(alien_matrix[move]) == 0]
-    print(zero_alienprob)
+    # print(zero_alienprob)
     nonzero_crewprob = [move for move in moves if crew_matrix[index_mapping[move]].sum() != 0]
     chosen_cell = None
 
@@ -619,19 +619,19 @@ def determine_move_2crew2alien(moves, alien_matrix, crew_matrix, index_mapping):
                 candidates = [cell] # Reset list of highest probability cells if new max found
             elif current_crewprob == max_crewprob:
                 candidates.append(cell) # Add cell to list if same probability as max
-        print(f"Canidates : {candidates}")        
+        # print(f"Candidates : {candidates}")        
         return random.choice(candidates) if candidates else None # Randomly break ties
 
     # Case at least one move with 0 alien probability
     if zero_alienprob:
-        print("0")
+        # print("0")
         chosen_cell = find_max_prob_cell(zero_alienprob)
     # Case at least one move with nonzero crew probability
     elif nonzero_crewprob:
-        print("1")
+        # print("1")
         chosen_cell = find_max_prob_cell(nonzero_crewprob)
     else:
-        print("2")
+        # print("2")
         chosen_cell = find_max_prob_cell(moves)
 
     return chosen_cell
@@ -1448,7 +1448,7 @@ def Bot7(k, alpha, max_iter, timeout):
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
         
-        print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
+        # print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
 
         alien_matrix, crew_matrix = update_afterbotmove_2crew2alien(bot, alien_matrix, crew_matrix, index_mapping_alien, index_mapping_crew)
 
@@ -1481,7 +1481,7 @@ def Bot7(k, alpha, max_iter, timeout):
         alien_matrix = update_afteralienmove_2alien(ship, alien_list, alien_matrix, index_mapping_alien) # Update after alien move
         
         alien_detected = alien_sensor(alien_list, bot, k) # Run Alien Sensor
-        print(alien_detected)
+        # print(alien_detected)
         crew_detected, d_lookup_table = crew_sensor(ship, bot, alpha, d_lookup_table, crew_list) # Run Crew Sensor
         
         alien_matrix = update_alienmatrix_2alien(alien_matrix, alien_detected, bot, k, index_mapping_alien, open_cells) # Update based on alien sensor
@@ -1872,4 +1872,5 @@ timeout = 10000
 # one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
 # one_alien_two_crew(alpha_values, k_values, max_iter, timeout)
 # two_alien_two_crew(alpha_values, k_values, max_iter, timeout)
+
 Bot7(3, 0.1, 2, 10000)
