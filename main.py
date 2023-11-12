@@ -312,31 +312,55 @@ def update_alienmatrix(alien_matrix, detected, bot, k):
 
 def update_alienmatrix_2alien(alien_matrix, alien_detected, bot, k, index_mapping, open_cells):
     if alien_detected:
-        outside_detectionsqaure = []
-        for cell in open_cells:
-            if not ((bot[0]-k <= cell[0] <= bot[0]+k) and (bot[1]-k <= cell[1] <= bot[1]+k)):
-                outside_detectionsqaure.append(cell)
-        total_sum = 0
-        for cell in outside_detectionsqaure:
-            total_sum = total_sum + np.sum(alien_matrix[index_mapping[cell]]) + np.sum(alien_matrix[:, index_mapping[cell]]) 
-        if total_sum != 0:
-            alien_matrix *= 0
-            for cell in outside_detectionsqaure:
-                alien_matrix[index_mapping[cell]] = alien_matrix[index_mapping[cell]] / total_sum
-                alien_matrix[:,index_mapping[cell]] = alien_matrix[:,index_mapping[cell]] / total_sum
-    else:
         in_detectionsqaure = []
         for cell in open_cells:
-            if (bot[0]-k <= cell[0] <= bot[0]+k) and (bot[1]-k <= cell[1] <= bot[1]+k):
+            if ((bot[0]-k <= cell[0] <= bot[0]+k) and (bot[1]-k <= cell[1] <= bot[1]+k)):
                 in_detectionsqaure.append(cell)
+        
+        outside_detectionsqaure = open_cells - in_detectionsqaure
+        for cell in outside_detectionsqaure:
+            for c in outside_detectionsqaure:
+                alien_matrix[index_mapping[cell]][index_mapping[c]] = 0
+
         total_sum = 0
         for cell in in_detectionsqaure:
             total_sum = total_sum + np.sum(alien_matrix[index_mapping[cell]]) + np.sum(alien_matrix[:, index_mapping[cell]]) 
         if total_sum != 0:
-            alien_matrix *= 0
-            for cell in in_detectionsqaure:
-                alien_matrix[index_mapping[cell]] = alien_matrix[index_mapping[cell]] / total_sum
-                alien_matrix[:,index_mapping[cell]] = alien_matrix[:,index_mapping[cell]] / total_sum
+            alien_matrix = alien_matrix * (1/total_sum)
+    else:
+        in_detectionsqaure = []
+        for cell in open_cells:
+            if ((bot[0]-k <= cell[0] <= bot[0]+k) and (bot[1]-k <= cell[1] <= bot[1]+k)):
+                in_detectionsqaure.append(cell)
+        
+        outside_detectionsqaure = open_cells - in_detectionsqaure
+        for cell in in_detectionsqaure:
+            alien_matrix[index_mapping[cell]] = 0
+            alien_matrix[:, index_mapping[cell]] = 0
+        
+        total_sum = np.sum(alien_matrix)
+        alien_matrix = alien_matrix / total_sum
+        
+        #     outside_detectionsqaure = open_cells - in_detectionsqaure
+        #     for cell in outside_detectionsqaure:
+        #         alien_matrix[index_mapping[cell]] = 0
+        #         alien_matrix[:, ]
+        #     for cell in in_detectionsqaure:
+        #         alien_matrix[index_mapping[cell]] = alien_matrix[index_mapping[cell]] / total_sum
+        #         alien_matrix[:,index_mapping[cell]] = alien_matrix[:,index_mapping[cell]] / total_sum
+        # else:
+        #     outside_detectionsqaure = []
+        #     for cell in open_cells:
+        #         if not (bot[0]-k <= cell[0] <= bot[0]+k) and (bot[1]-k <= cell[1] <= bot[1]+k):
+        #             outside_detectionsqaure.append(cell)
+        #     total_sum = 0
+        #     for cell in outside_detectionsqaure:
+        #         total_sum = total_sum + np.sum(alien_matrix[index_mapping[cell]]) + np.sum(alien_matrix[:, index_mapping[cell]]) 
+        #     if total_sum != 0:
+        #         alien_matrix *= 0
+        #         for cell in outside_detectionsqaure:
+        #             alien_matrix[index_mapping[cell]] = alien_matrix[index_mapping[cell]] / total_sum
+        #             alien_matrix[:,index_mapping[cell]] = alien_matrix[:,index_mapping[cell]] / total_sum
 
     return alien_matrix
 
@@ -577,6 +601,7 @@ def determine_move_2crew(moves, alien_matrix, crew_matrix, index_mapping):
 def determine_move_2crew2alien(moves, alien_matrix, crew_matrix, index_mapping):
     
     zero_alienprob = [move for move in moves if np.sum(alien_matrix[move]) == 0]
+    print(zero_alienprob)
     nonzero_crewprob = [move for move in moves if crew_matrix[index_mapping[move]].sum() != 0]
     chosen_cell = None
 
@@ -594,19 +619,19 @@ def determine_move_2crew2alien(moves, alien_matrix, crew_matrix, index_mapping):
                 candidates = [cell] # Reset list of highest probability cells if new max found
             elif current_crewprob == max_crewprob:
                 candidates.append(cell) # Add cell to list if same probability as max
-                
+        print(f"Canidates : {candidates}")        
         return random.choice(candidates) if candidates else None # Randomly break ties
 
     # Case at least one move with 0 alien probability
     if zero_alienprob:
-        # print("0")
+        print("0")
         chosen_cell = find_max_prob_cell(zero_alienprob)
     # Case at least one move with nonzero crew probability
     elif nonzero_crewprob:
-        # print("1")
+        print("1")
         chosen_cell = find_max_prob_cell(nonzero_crewprob)
     else:
-        # print("2")
+        print("2")
         chosen_cell = find_max_prob_cell(moves)
 
     return chosen_cell
@@ -1390,6 +1415,7 @@ def Bot7(k, alpha, max_iter, timeout):
         
         prev_win_count = win_count
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 7)
+       
         move += 1
 
         if marker == 1:
@@ -1422,7 +1448,7 @@ def Bot7(k, alpha, max_iter, timeout):
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
         
-        # print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
+        print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
 
         alien_matrix, crew_matrix = update_afterbotmove_2crew2alien(bot, alien_matrix, crew_matrix, index_mapping_alien, index_mapping_crew)
 
@@ -1455,6 +1481,7 @@ def Bot7(k, alpha, max_iter, timeout):
         alien_matrix = update_afteralienmove_2alien(ship, alien_list, alien_matrix, index_mapping_alien) # Update after alien move
         
         alien_detected = alien_sensor(alien_list, bot, k) # Run Alien Sensor
+        print(alien_detected)
         crew_detected, d_lookup_table = crew_sensor(ship, bot, alpha, d_lookup_table, crew_list) # Run Crew Sensor
         
         alien_matrix = update_alienmatrix_2alien(alien_matrix, alien_detected, bot, k, index_mapping_alien, open_cells) # Update based on alien sensor
@@ -1842,6 +1869,7 @@ k_values = [1, 3, 5]
 max_iter = 30
 timeout = 10000
 
-one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
-one_alien_two_crew(alpha_values, k_values, max_iter, timeout)
-two_alien_two_crew(alpha_values, k_values, max_iter, timeout)
+# one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
+# one_alien_two_crew(alpha_values, k_values, max_iter, timeout)
+# two_alien_two_crew(alpha_values, k_values, max_iter, timeout)
+Bot7(3, 0.1, 2, 10000)
