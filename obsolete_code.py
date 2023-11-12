@@ -492,3 +492,30 @@
 #         crew_matrix = crew_matrix / total_summation # Normalize probabilities
 
 #     return crew_matrix
+
+# # Update probabilties for alien matrix based on beep (in the case of 2 aliens)
+# def update_alienmatrix_2alien(alien_matrix, alien_detected, bot, k, index_mapping, open_cells):
+#     if alien_detected:
+               
+#             outside_detectionsqaure = open_cells - in_detectionsqaure
+#             for cell in outside_detectionsqaure:
+#                 alien_matrix[index_mapping[cell]] = 0
+#                 alien_matrix[:, ]
+#             for cell in in_detectionsqaure:
+#                 alien_matrix[index_mapping[cell]] = alien_matrix[index_mapping[cell]] / total_sum
+#                 alien_matrix[:,index_mapping[cell]] = alien_matrix[:,index_mapping[cell]] / total_sum
+#         else:
+#             outside_detectionsqaure = []
+#             for cell in open_cells:
+#                 if not (bot[0]-k <= cell[0] <= bot[0]+k) and (bot[1]-k <= cell[1] <= bot[1]+k):
+#                     outside_detectionsqaure.append(cell)
+#             total_sum = 0
+#             for cell in outside_detectionsqaure:
+#                 total_sum = total_sum + np.sum(alien_matrix[index_mapping[cell]]) + np.sum(alien_matrix[:, index_mapping[cell]]) 
+#             if total_sum != 0:
+#                 alien_matrix *= 0
+#                 for cell in outside_detectionsqaure:
+#                     alien_matrix[index_mapping[cell]] = alien_matrix[index_mapping[cell]] / total_sum
+#                     alien_matrix[:,index_mapping[cell]] = alien_matrix[:,index_mapping[cell]] / total_sum
+
+#     return alien_matrix

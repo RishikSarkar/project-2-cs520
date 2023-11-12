@@ -341,27 +341,6 @@ def update_alienmatrix_2alien(alien_matrix, alien_detected, bot, k, index_mappin
         
         total_sum = np.sum(alien_matrix)
         alien_matrix = alien_matrix / total_sum
-        
-        #     outside_detectionsqaure = open_cells - in_detectionsqaure
-        #     for cell in outside_detectionsqaure:
-        #         alien_matrix[index_mapping[cell]] = 0
-        #         alien_matrix[:, ]
-        #     for cell in in_detectionsqaure:
-        #         alien_matrix[index_mapping[cell]] = alien_matrix[index_mapping[cell]] / total_sum
-        #         alien_matrix[:,index_mapping[cell]] = alien_matrix[:,index_mapping[cell]] / total_sum
-        # else:
-        #     outside_detectionsqaure = []
-        #     for cell in open_cells:
-        #         if not (bot[0]-k <= cell[0] <= bot[0]+k) and (bot[1]-k <= cell[1] <= bot[1]+k):
-        #             outside_detectionsqaure.append(cell)
-        #     total_sum = 0
-        #     for cell in outside_detectionsqaure:
-        #         total_sum = total_sum + np.sum(alien_matrix[index_mapping[cell]]) + np.sum(alien_matrix[:, index_mapping[cell]]) 
-        #     if total_sum != 0:
-        #         alien_matrix *= 0
-        #         for cell in outside_detectionsqaure:
-        #             alien_matrix[index_mapping[cell]] = alien_matrix[index_mapping[cell]] / total_sum
-        #             alien_matrix[:,index_mapping[cell]] = alien_matrix[:,index_mapping[cell]] / total_sum
 
     return alien_matrix
 
@@ -708,6 +687,91 @@ def determine_move_2crew2alien(moves, alien_matrix, crew_matrix, index_mapping):
 
     return chosen_cell
 
+# Determine the best neighboring cell for Bot 8 to move to
+# Bot 8 finds the safest quadrant and the highest probability quadrant for the crew by determining the sum of the probabilities of aliens and crew being in a half and prioritizes movements towards those quadrants while breaking ties
+def determine_move_bot8(moves, alien_matrix, crew_matrix, index_mapping, bot):
+    
+    zero_alienprob = [move for move in moves if alien_matrix[move] == 0]
+    nonzero_crewprob = [move for move in moves if crew_matrix[index_mapping[move]].sum() != 0]
+    chosen_cell = None
+
+    # Calculate alien probability sums for each quadrant
+    up_alien_sum = alien_matrix[:bot[0], :].sum()
+    down_alien_sum = alien_matrix[bot[0]+1:, :].sum()
+    left_alien_sum = alien_matrix[:, :bot[1]].sum()
+    right_alien_sum = alien_matrix[:, bot[1]+1:].sum()
+
+    up_crew_sum = crew_matrix[:bot[0], :].sum()
+    down_crew_sum = crew_matrix[bot[0]+1:, :].sum()
+    left_crew_sum = crew_matrix[:, :bot[1]].sum()
+    right_crew_sum = crew_matrix[:, bot[1]+1:].sum()
+
+    # Determine the safest quadrant and quadrant with highest crew probability
+    safest_min_sum = min(up_alien_sum, down_alien_sum, left_alien_sum, right_alien_sum)
+    highest_crew_sum = max(up_crew_sum, down_crew_sum, left_crew_sum, right_crew_sum)
+
+    # Find the safe quadrants
+    up_safe = down_safe = left_safe = right_safe = False
+    if up_alien_sum == safest_min_sum:
+        up_safe = True
+    if down_alien_sum == safest_min_sum:
+        down_safe = True
+    if left_alien_sum == safest_min_sum:
+        left_safe = True
+    if right_alien_sum == safest_min_sum:
+        right_safe = True
+
+    # Find the quadrants with highest crew probability
+    up_crew = down_crew = left_crew = right_crew = False
+    if up_crew_sum == highest_crew_sum:
+        up_crew = True
+    if down_crew_sum == highest_crew_sum:
+        down_crew = True
+    if left_crew_sum == highest_crew_sum:
+        left_crew = True
+    if right_crew_sum == highest_crew_sum:
+        right_crew = True
+
+    def find_max_prob_cell(cell_list):
+        max_crewprob = -1
+        candidates = []
+        for cell in cell_list:
+            cell_index = index_mapping[cell] # Retrieve index mapping of current cell
+            current_crewprob = np.sum(crew_matrix[cell_index, :]) + np.sum(crew_matrix[:, cell_index]) # Sum probability of crew in current cell with all other cells
+            current_crewprob -= crew_matrix[cell_index, cell_index] # Avoid double-counting
+
+            # Find max probability cell
+            if current_crewprob > max_crewprob:
+                max_crewprob = current_crewprob
+                candidates = [cell] # Reset list of highest probability cells if new max found
+            elif current_crewprob == max_crewprob:
+                candidates.append(cell) # Add cell to list if same probability as max
+
+        # Filter out the cells that are in the direction of the safest quadrants
+        direction_filtered_candidates = []
+        for cell in candidates:
+            if ((up_safe or up_crew) and cell[0] >= bot[0]) or ((down_safe or down_crew) and cell[0] <= bot[0]) or ((left_safe or left_crew) and cell[1] >= bot[1]) or ((right_safe or right_crew) and cell[1] <= bot[1]):
+                direction_filtered_candidates.append(cell)
+
+        # Return a random neighbor out of filtered candidates if found
+        if direction_filtered_candidates:
+            return random.choice(direction_filtered_candidates)
+        
+        # If not filtered candidates found, randomly break ties
+        return random.choice(candidates) if candidates else None
+
+    # Prioritize saving crew (but more carefully)
+    # Case at least one move with nonzero crew probability
+    if nonzero_crewprob:
+        chosen_cell = find_max_prob_cell(nonzero_crewprob)
+    # Case at least one move with 0 alien probability
+    elif zero_alienprob:
+        chosen_cell = find_max_prob_cell(zero_alienprob)
+    else:
+        chosen_cell = find_max_prob_cell(moves)
+
+    return chosen_cell
+
 # Update probabilities in matrices when the bot moves (in the case of 2 crew members)
 def update_afterbotmove_2crew(bot, alien_matrix, crew_matrix, index_mapping):
     # Prior Probability alien not in current cell
@@ -874,7 +938,7 @@ def Bot1(k, alpha, max_iter, timeout):
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix = initialize_crewmatrix(open_cells, crew_list, bot)
         
-        # print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
+        print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
 
         alien_matrix, crew_matrix = update_afterbotmove(bot, alien_matrix, crew_matrix)
 
@@ -976,7 +1040,7 @@ def Bot2(k, alpha, max_iter, timeout):
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix = initialize_crewmatrix(open_cells, crew_list, bot)
         
-        # print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
+        print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
 
         alien_matrix, crew_matrix = update_afterbotmove(bot, alien_matrix, crew_matrix)
 
@@ -1081,7 +1145,7 @@ def Bot3(k, alpha, max_iter, timeout):
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix = initialize_crewmatrix(open_cells, crew_list, bot)
         
-        # print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
+        print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
 
         alien_matrix, crew_matrix = update_afterbotmove(bot, alien_matrix, crew_matrix)
 
@@ -1188,7 +1252,7 @@ def Bot4(k, alpha, max_iter, timeout):
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
         
-        # print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
+        print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
 
         alien_matrix, crew_matrix = update_afterbotmove_2crew(bot, alien_matrix, crew_matrix, index_mapping_crew)
 
@@ -1404,7 +1468,7 @@ def Bot6(k, alpha, max_iter, timeout):
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix = initialize_crewmatrix(open_cells, crew_list, bot)
         
-        # print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
+        print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
 
         alien_matrix, crew_matrix = update_afterbotmove(bot, alien_matrix, crew_matrix)
 
@@ -1512,10 +1576,10 @@ def Bot7(k, alpha, max_iter, timeout):
             print(f"Both crew members saved! Win Count: {win_count}, Loss Count: {loss_count}")
             win_move_count.append(move)
             move = 0
-            alien_matrix = initialize_alienmatrix(open_cells, bot, k)
+            alien_matrix, index_mapping_alien = initialize_alienmatrix_2alien(open_cells, bot, k)
             crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
         
-        # print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
+        print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
 
         alien_matrix, crew_matrix = update_afterbotmove_2crew2alien(bot, alien_matrix, crew_matrix, index_mapping_alien, index_mapping_crew)
 
@@ -1590,7 +1654,7 @@ def Bot8(k, alpha, max_iter, timeout):
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
-        next_move = determine_move_2crew2alien(open_moves, alien_matrix, crew_matrix, index_mapping_crew)
+        next_move = determine_move_bot8(open_moves, alien_matrix, crew_matrix, index_mapping_crew, bot)
         
         prev_win_count = win_count
         bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 8)
@@ -1623,10 +1687,10 @@ def Bot8(k, alpha, max_iter, timeout):
             print(f"Both crew members saved! Win Count: {win_count}, Loss Count: {loss_count}")
             win_move_count.append(move)
             move = 0
-            alien_matrix = initialize_alienmatrix(open_cells, bot, k)
+            alien_matrix, index_mapping_alien = initialize_alienmatrix_2alien(open_cells, bot, k)
             crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
         
-        # print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
+        print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
 
         alien_matrix, crew_matrix = update_afterbotmove_2crew2alien(bot, alien_matrix, crew_matrix, index_mapping_alien, index_mapping_crew)
 
@@ -1917,13 +1981,14 @@ def two_alien_two_crew(alpha_values, k_values, max_iter, timeout):
 # Testing Area
 
 # Params: k, alpha, max_iter, timeout
-print(Bot1(3, 0.1, 2, 10000))
-print(Bot2(3, 0.1, 2, 10000))
-print(Bot3(3, 0.1, 2, 10000))
-print(Bot4(3, 0.1, 2, 10000))
-print(Bot5(3, 0.1, 2, 10000))
-print(Bot6(3, 0.1, 2, 10000))
-print(Bot7(3, 0.1, 2, 10000))
+# print(Bot1(3, 0.1, 2, 10000))
+# print(Bot2(3, 0.1, 2, 10000))
+# print(Bot3(3, 0.1, 2, 10000))
+# print(Bot4(3, 0.1, 2, 10000))
+# print(Bot5(3, 0.1, 2, 10000))
+# print(Bot6(3, 0.1, 2, 10000))
+# print(Bot7(3, 0.1, 2, 10000))
+print(Bot8(3, 0.1, 2, 10000))
 
 
 # alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
