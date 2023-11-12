@@ -935,6 +935,7 @@ def Bot1(k, alpha, max_iter, timeout):
             print(f"Crew saved! Win Count: {win_count}, Loss Count: {loss_count}")
             win_move_count.append(move)
             move = 0
+            d_lookup_table = {}
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix = initialize_crewmatrix(open_cells, crew_list, bot)
         
@@ -1037,6 +1038,7 @@ def Bot2(k, alpha, max_iter, timeout):
 
             win_move_count.append(move)
             move = 0
+            d_lookup_table = {}
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix = initialize_crewmatrix(open_cells, crew_list, bot)
         
@@ -1142,6 +1144,7 @@ def Bot3(k, alpha, max_iter, timeout):
             print(f"Both crew members saved! Win Count: {win_count}, Loss Count: {loss_count}")
             win_move_count.append(move)
             move = 0
+            d_lookup_table = {}
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix = initialize_crewmatrix(open_cells, crew_list, bot)
         
@@ -1249,6 +1252,7 @@ def Bot4(k, alpha, max_iter, timeout):
             print(f"Both crew members saved! Win Count: {win_count}, Loss Count: {loss_count}")
             win_move_count.append(move)
             move = 0
+            d_lookup_table = {}
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
         
@@ -1356,6 +1360,7 @@ def Bot5(k, alpha, max_iter, timeout):
             print(f"Both crew members saved! Win Count: {win_count}, Loss Count: {loss_count}")
             win_move_count.append(move)
             move = 0
+            d_lookup_table = {}
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
         
@@ -1465,6 +1470,7 @@ def Bot6(k, alpha, max_iter, timeout):
             print(f"Both crew members saved! Win Count: {win_count}, Loss Count: {loss_count}")
             win_move_count.append(move)
             move = 0
+            d_lookup_table = {}
             alien_matrix = initialize_alienmatrix(open_cells, bot, k)
             crew_matrix = initialize_crewmatrix(open_cells, crew_list, bot)
         
@@ -1576,6 +1582,7 @@ def Bot7(k, alpha, max_iter, timeout):
             print(f"Both crew members saved! Win Count: {win_count}, Loss Count: {loss_count}")
             win_move_count.append(move)
             move = 0
+            d_lookup_table = {}
             alien_matrix, index_mapping_alien = initialize_alienmatrix_2alien(open_cells, bot, k)
             crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
         
@@ -1687,6 +1694,7 @@ def Bot8(k, alpha, max_iter, timeout):
             print(f"Both crew members saved! Win Count: {win_count}, Loss Count: {loss_count}")
             win_move_count.append(move)
             move = 0
+            d_lookup_table = {}
             alien_matrix, index_mapping_alien = initialize_alienmatrix_2alien(open_cells, bot, k)
             crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
         
@@ -1996,9 +2004,9 @@ def two_alien_two_crew(alpha_values, k_values, max_iter, timeout):
 # max_iter = 30
 # timeout = 10000
 
-alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
+alpha_values = [0.3]
 k_values = [3]
-max_iter = 3
+max_iter = 2
 timeout = 10000
 
 one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
