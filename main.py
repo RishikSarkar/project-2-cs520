@@ -654,7 +654,7 @@ def update_afterbotmove_2crew2alien(bot, alien_matrix, crew_matrix, index_mappin
 
 
 # Update probabilties for crew matrix based on beep
-def update_crewmatrix_2crew(crew_matrix, detected, d_lookup_table, bot, alpha, grid, index_mapping, open_cells):
+def update_crewmatrix_2crew(crew_matrix, detected, d_lookup_table, bot, alpha, index_mapping, open_cells):
     d_dict = d_lookup_table.get(bot) # Get the d dictionary calculated with the crew sensor
     if detected:
         for cell in open_cells:
@@ -990,7 +990,7 @@ def Bot4(k, alpha):
         alien_matrix = update_alienmatrix(alien_matrix, alien_detected, bot, k) # Update based on alien censor
         # print(alien_matrix, "\n\n\n")
 
-        crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, ship, index_mapping) # Update based on crew censor
+        crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping, open_cells) # Update based on crew censor
     
     return True
     
@@ -1108,7 +1108,7 @@ def Bot7(k, alpha):
         crew_detected, d_lookup_table = crew_sensor(ship, bot, alpha, d_lookup_table, crew_list) # Run Crew Sensor
 
         alien_matrix = update_alienmatrix_2alien(alien_matrix, alien_detected, bot, k, index_mapping_alien, open_cells) # Update based on alien censor
-        crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, ship, index_mapping_crew, open_cells) # Update based on crew censor
+        crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping_crew, open_cells) # Update based on crew censor
 
 
 # Testing Area
