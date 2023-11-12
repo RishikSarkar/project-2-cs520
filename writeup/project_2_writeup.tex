@@ -1,0 +1,134 @@
+\documentclass[11pt]{article}
+\usepackage[tmargin=1in,lmargin=1in,rmargin=1in,bmargin=1.2in]{geometry}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.25em}
+\usepackage{setspace}
+\setstretch{1.1}
+
+\usepackage{graphicx} % Required for inserting images
+
+\title{CS520 Project 2 Data and Analysis}
+\author{Aditya Girish, Rishik Sarkar}
+\date{November 10 2023}
+
+\begin{document}
+
+\maketitle
+
+\section{Bot Designs and Algorithms}
+
+\subsection{Initial Setup}
+
+This project is similar to the first one in that it involves a bot traversing through a grid maze of cells to save crew members while avoiding aliens. In our project version, we created a 30 x 30 NumPy grid containing 0s and 1s, with 0 representing open cells that the bot, aliens, and crew members can exist/move on and 1 representing closed cells (or walls). We have included the Python project within a single file, \emph{main.py}, which contains all the processes for probabilistic updates, sensing, bot and alien movement functions, version-specific bot simulations, and a thorough testing process for each bot that I shall outline in section 3. In our Python project, we use the following characters to represent each entity:
+
+\begin{itemize}
+    \item 0: Open Cell
+    \item 1: Closed Cell
+    \item 2: Bot
+    \item 3: Alien(s)
+    \item 4: Crew Member(s)
+\end{itemize}
+
+Furthermore, as defined in the project outline, there are 8 possible scenarios involving different combinations of bots, crew members, and aliens. Bots 1 and 2 involve 1 bot, 1 crew member, and 1 alien; Bots 3, 4, and 5 involve 1 bot, 2 crew members, and 1 alien; and Bots 6, 7, and 8 involve 1 bot, 2 crew members, and 2 aliens. Each scenario involves certain similarities and differences in the grid traversal algorithm for the bot, but all of them involve deterministic and probabilistic processes that I shall outline below.
+
+\subsection{One Alien, One Crew}
+
+As mentioned earlier, Bot 1 and Bot 2 both involve 1 bot, 1 alien, and 1 crew member within a 30 x 30 grid maze.
+
+\subsubsection{Bot 1}
+
+Bot 1 utilizes a crew sensor and an alien sensor at every single time step to figure out if there is a crew member or alien nearby. On top of that, the probabilities of the crew member and alien being at a particular cell are updated every time the bot and alien move. Bot 1 stores the probabilities of the crew and alien being in a certain cell (i, j) within two 30 x 30 probability matrices \textit{crew\_matrix} and \textit{alien\_matrix}.
+
+\subsubsection{Bot 2}
+
+\subsection{One Alien, Two Crew}
+
+\subsubsection{Bot 3}
+
+\subsubsection{Bot 4}
+
+\subsubsection{Bot 5}
+
+\subsection{Two Aliens, Two Crew}
+
+\subsubsection{Bot 6}
+
+\subsubsection{Bot 7}
+
+\subsubsection{Bot 8}
+
+
+
+\section{Probability Models and Updates}
+
+\subsection{One Alien, One Crew}
+
+\subsubsection{Bot 1}
+
+\subsubsection{Bot 2}
+
+\subsection{One Alien, Two Crew}
+
+\subsubsection{Bot 3}
+
+\subsubsection{Bot 4}
+
+\subsubsection{Bot 5}
+
+\subsection{Two Aliens, Two Crew}
+
+\subsubsection{Bot 6}
+
+\subsubsection{Bot 7}
+
+\subsubsection{Bot 8}
+
+
+
+\section{Performance Evaluation}
+
+\subsection{Average Moves to Save All Crew}
+
+\begin{itemize}
+    \item Bot 1 vs. Bot 2
+    \item Bot 3 vs. Bot 4 vs. Bot 5
+    \item Bot 6 vs. Bot 7 vs. Bot 8
+\end{itemize}
+
+\subsection{Probability of Avoiding Alien and Saving Crew}
+
+\begin{itemize}
+    \item Bot 1 vs. Bot 2
+    \item Bot 3 vs. Bot 4 vs. Bot 5
+    \item Bot 6 vs. Bot 7 vs. Bot 8
+\end{itemize}
+
+\subsection{Average Number of Crew Saved}
+
+\begin{itemize}
+    \item Bot 1 vs. Bot 2
+    \item Bot 3 vs. Bot 4 vs. Bot 5
+    \item Bot 6 vs. Bot 7 vs. Bot 8
+\end{itemize}
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.75\linewidth]{placeholder}
+%     \caption{D=15, K=7 (Win Rate)}
+%     \label{fig:sim-2-win}
+% \end{figure}
+
+\section{The Ideal Bot}
+
+
+
+\section{Bonus}
+
+
+
+\section{Final Thoughts and Relevant Information}
+
+
+
+\end{document}

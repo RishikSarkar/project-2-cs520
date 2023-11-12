@@ -723,7 +723,7 @@ def initialize_alienmatrix_2alien(open_cells, bot, k):
 
 
 # 1 crew 1 alien bot 
-def Bot1(k, alpha, max_iter):
+def Bot1(k, alpha, max_iter, timeout):
     grid, open_cells = create_grid()
     bot, ship, open_cells = place_bot(grid, open_cells)
 
@@ -744,7 +744,7 @@ def Bot1(k, alpha, max_iter):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter:
+    while (win_count + loss_count) < max_iter and move < timeout:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -817,14 +817,14 @@ def Bot1(k, alpha, max_iter):
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / (win_count + loss_count)), win_count
+    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
 
 
 # 1 crew 1 alien bot (Prioritizes saving crew member over escaping alien)
-def Bot2(k, alpha, max_iter):
+def Bot2(k, alpha, max_iter, timeout):
     grid, open_cells = create_grid()
     bot, ship, open_cells = place_bot(grid, open_cells)
 
@@ -845,7 +845,7 @@ def Bot2(k, alpha, max_iter):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter:
+    while (win_count + loss_count) < max_iter and move < timeout:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -919,14 +919,14 @@ def Bot2(k, alpha, max_iter):
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / (win_count + loss_count)), win_count
+    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
 
 
 # 2 crew 1 alien bot
-def Bot3(k, alpha, max_iter):
+def Bot3(k, alpha, max_iter, timeout):
     grid, open_cells = create_grid()
     bot, ship, open_cells = place_bot(grid, open_cells)
 
@@ -949,7 +949,7 @@ def Bot3(k, alpha, max_iter):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter:
+    while (win_count + loss_count) < max_iter and move < timeout:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1026,14 +1026,14 @@ def Bot3(k, alpha, max_iter):
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / (win_count + loss_count)), win_count
+    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
 
 
 # 2 crew, 1 alien (Considering probabilities for both crew members)
-def Bot4(k, alpha, max_iter):
+def Bot4(k, alpha, max_iter, timeout):
     grid, open_cells = create_grid()
     bot, ship, open_cells = place_bot(grid, open_cells)
 
@@ -1056,7 +1056,7 @@ def Bot4(k, alpha, max_iter):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter:
+    while (win_count + loss_count) < max_iter and move < timeout:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1133,15 +1133,15 @@ def Bot4(k, alpha, max_iter):
 
         crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping_crew, open_cells) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / (win_count + loss_count)), win_count
+    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
 
 
-#TODO: Complete function
+#TODO: Complete Bot
 # 2 crew, 1 alien (Custom Bot)
-def Bot5(k, alpha, max_iter):
+def Bot5(k, alpha, max_iter, timeout):
     grid, open_cells = create_grid()
     bot, ship, open_cells = place_bot(grid, open_cells)
 
@@ -1164,7 +1164,7 @@ def Bot5(k, alpha, max_iter):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter:
+    while (win_count + loss_count) < max_iter and move < timeout:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1241,14 +1241,14 @@ def Bot5(k, alpha, max_iter):
 
         crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping_crew, open_cells) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / (win_count + loss_count)), win_count
+    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
 
 
 # 2 crew 2 alien bot
-def Bot6(k, alpha, max_iter):
+def Bot6(k, alpha, max_iter, timeout):
     grid, open_cells = create_grid()
     bot, ship, open_cells = place_bot(grid, open_cells)
 
@@ -1272,7 +1272,7 @@ def Bot6(k, alpha, max_iter):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter:
+    while (win_count + loss_count) < max_iter and move < timeout:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1351,14 +1351,14 @@ def Bot6(k, alpha, max_iter):
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / (win_count + loss_count)), win_count
+    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
 
 
 # 2 crew 2 alien bot (Considering probabilities for both crew members and both aliens)
-def Bot7(k, alpha, max_iter):
+def Bot7(k, alpha, max_iter, timeout):
     grid, open_cells = create_grid()
     bot, ship, open_cells = place_bot(grid, open_cells)
 
@@ -1382,7 +1382,7 @@ def Bot7(k, alpha, max_iter):
     win_move_count = []
     marker = 0
 
-    while (win_count + loss_count) < max_iter:
+    while (win_count + loss_count) < max_iter and move < timeout:
         neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
         open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
         open_moves.append(bot) # Bot can stay in place 
@@ -1461,7 +1461,118 @@ def Bot7(k, alpha, max_iter):
 
         crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping_crew, open_cells) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / (win_count + loss_count)), win_count
+    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
+
+
+
+
+
+#TODO: Complete Bot
+# 2 crew 2 alien bot (Custom Bot)
+def Bot8(k, alpha, max_iter, timeout):
+    grid, open_cells = create_grid()
+    bot, ship, open_cells = place_bot(grid, open_cells)
+
+    crew_list = []
+    alien_list = []
+    d_lookup_table = {}
+
+    # Place 2 crew members + 2 aliens
+    crew_list, ship = place_crew(ship, open_cells, crew_list)
+    crew_list, ship = place_crew(ship, open_cells, crew_list)
+
+    alien_list, ship = place_alien(ship, open_cells, alien_list, bot, k)
+    alien_list, ship = place_alien(ship, open_cells, alien_list, bot, k)
+
+    alien_matrix, index_mapping_alien = initialize_alienmatrix_2alien(open_cells, bot, k)
+    crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
+
+    win_count = 0
+    loss_count = 0
+    move = 0
+    win_move_count = []
+    marker = 0
+
+    while (win_count + loss_count) < max_iter and move < timeout:
+        neighbors = check_valid_neighbors(len(ship), bot[0], bot[1])
+        open_moves = [neigh for neigh in neighbors if (grid[neigh] != 1)]
+        open_moves.append(bot) # Bot can stay in place 
+        next_move = determine_move_2crew2alien(open_moves, alien_matrix, crew_matrix, index_mapping_crew)
+        
+        prev_win_count = win_count
+        bot, crew_list, ship, open_cells, win_count, marker = move_bot(ship, bot, next_move, crew_list, alien_list, open_cells, win_count, 8)
+        move += 1
+
+        if marker == 1:
+            loss_count += 1
+            print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
+
+            grid, open_cells = reset_grid(grid, open_cells)
+            bot, ship, open_cells = place_bot(grid, open_cells)
+            crew_list = []
+            alien_list = []
+            d_lookup_table = {}
+            
+            crew_list, ship = place_crew(ship, open_cells, crew_list)
+            crew_list, ship = place_crew(ship, open_cells, crew_list)
+
+            alien_list, ship = place_alien(ship, open_cells, alien_list, bot, k)
+            alien_list, ship = place_alien(ship, open_cells, alien_list, bot, k)
+
+            alien_matrix, index_mapping_alien = initialize_alienmatrix_2alien(open_cells, bot, k)
+            crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
+            marker = 0
+            move = 0
+
+            continue
+
+        if win_count > prev_win_count:
+            print(f"Both crew members saved! Win Count: {win_count}, Loss Count: {loss_count}")
+            win_move_count.append(move)
+            move = 0
+            alien_matrix = initialize_alienmatrix(open_cells, bot, k)
+            crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
+        
+        # print(f"Bot: {bot}, Crew: {crew_list}, Aliens: {alien_list}")
+
+        alien_matrix, crew_matrix = update_afterbotmove_2crew2alien(bot, alien_matrix, crew_matrix, index_mapping_alien, index_mapping_crew)
+
+        # Move bot to optimal neighbor
+        marker, alien_list, ship = move_aliens(ship, alien_list, bot) # Move alien randomly
+
+        if marker == 1:
+            loss_count += 1
+            print(f"Bot captured! Win Count: {win_count}, Loss Count: {loss_count}")
+
+            grid, open_cells = reset_grid(grid, open_cells)
+            bot, ship, open_cells = place_bot(grid, open_cells)
+            crew_list = []
+            alien_list = []
+            d_lookup_table = {}
+            
+            crew_list, ship = place_crew(ship, open_cells, crew_list)
+            crew_list, ship = place_crew(ship, open_cells, crew_list)
+
+            alien_list, ship = place_alien(ship, open_cells, alien_list, bot, k)
+            alien_list, ship = place_alien(ship, open_cells, alien_list, bot, k)
+
+            alien_matrix, index_mapping_alien = initialize_alienmatrix_2alien(open_cells, bot, k)
+            crew_matrix, index_mapping_crew = initialize_crewmatrix_2crew(bot, open_cells)
+            marker = 0
+            move = 0
+
+            continue
+        
+        alien_matrix = update_afteralienmove_2alien(ship, alien_list, alien_matrix, index_mapping_alien) # Update after alien move
+        
+        alien_detected = alien_sensor(alien_list, bot, k) # Run Alien Sensor
+        crew_detected, d_lookup_table = crew_sensor(ship, bot, alpha, d_lookup_table, crew_list) # Run Crew Sensor
+        
+        alien_matrix = update_alienmatrix_2alien(alien_matrix, alien_detected, bot, k, index_mapping_alien, open_cells) # Update based on alien sensor
+
+        crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping_crew, open_cells) # Update based on crew sensor 
+
+    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
@@ -1469,14 +1580,14 @@ def Bot7(k, alpha, max_iter):
 
 # Bot 1 vs. Bot 2
 
-def Bot1_simulation(alpha_values, k_values, max_iter):
+def Bot1_simulation(alpha_values, k_values, max_iter, timeout):
     avg_rescue_moves = {k: [] for k in k_values}
     prob_crew_rescue = {k: [] for k in k_values}
     avg_crew_saved = {k: [] for k in k_values}
 
     for k in k_values:
         for alpha in alpha_values:
-            metric1, metric2, metric3 = Bot1(k, alpha, max_iter)
+            metric1, metric2, metric3 = Bot1(k, alpha, max_iter, timeout)
             print(f"k: {k}, Alpha: {alpha}\nAverage Rescue Moves: {metric1}\nProbability of Crew Rescue: {metric2}\nAverage Crew Saved: {metric3}\n")
             avg_rescue_moves[k].append(metric1)
             prob_crew_rescue[k].append(metric2)
@@ -1484,14 +1595,14 @@ def Bot1_simulation(alpha_values, k_values, max_iter):
 
     return avg_rescue_moves, prob_crew_rescue, avg_crew_saved
 
-def Bot2_simulation(alpha_values, k_values, max_iter):
+def Bot2_simulation(alpha_values, k_values, max_iter, timeout):
     avg_rescue_moves = {k: [] for k in k_values}
     prob_crew_rescue = {k: [] for k in k_values}
     avg_crew_saved = {k: [] for k in k_values}
 
     for k in k_values:
         for alpha in alpha_values:
-            metric1, metric2, metric3 = Bot2(k, alpha, max_iter)
+            metric1, metric2, metric3 = Bot2(k, alpha, max_iter, timeout)
             print(f"k: {k}, Alpha: {alpha}\nAverage Rescue Moves: {metric1}\nProbability of Crew Rescue: {metric2}\nAverage Crew Saved: {metric3}\n")
             avg_rescue_moves[k].append(metric1)
             prob_crew_rescue[k].append(metric2)
@@ -1517,21 +1628,13 @@ def plot_Bot1_vs_Bot2(alpha_values, k_values, bot1_data, bot2_data, title, metri
         plt.legend()
         plt.grid(True)
 
-        filename = os.path.join(save_dir, f'metric{metric_num}_k{k}1.png')
+        filename = os.path.join(save_dir, f'metric{metric_num}_k{k}.png')
         plt.savefig(filename)
         plt.close()
 
-def Bot1_vs_Bot2():
-    # alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
-    # k_values = [1, 2, 3, 4]
-    # max_iter = 30
-
-    alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
-    k_values = [3]
-    max_iter = 20
-
-    bot1_avg_rescue_moves, bot1_prob_crew_rescue, bot1_avg_crew_saved = Bot1_simulation(alpha_values, k_values, max_iter)
-    bot2_avg_rescue_moves, bot2_prob_crew_rescue, bot2_avg_crew_saved = Bot2_simulation(alpha_values, k_values, max_iter)
+def one_alien_one_crew(alpha_values, k_values, max_iter, timeout):
+    bot1_avg_rescue_moves, bot1_prob_crew_rescue, bot1_avg_crew_saved = Bot1_simulation(alpha_values, k_values, max_iter, timeout)
+    bot2_avg_rescue_moves, bot2_prob_crew_rescue, bot2_avg_crew_saved = Bot2_simulation(alpha_values, k_values, max_iter, timeout)
 
     print(bot1_avg_rescue_moves, bot1_prob_crew_rescue, bot1_avg_crew_saved, "\n")
     print(bot2_avg_rescue_moves, bot2_prob_crew_rescue, bot2_avg_crew_saved, "\n")
@@ -1541,14 +1644,204 @@ def Bot1_vs_Bot2():
     plot_Bot1_vs_Bot2(alpha_values, k_values, bot1_avg_crew_saved, bot2_avg_crew_saved, 'Average Crew Saved', 3)
 
 
+
+
+
+# Bot 3 vs. Bot 4 vs. Bot 5
+
+def Bot3_simulation(alpha_values, k_values, max_iter, timeout):
+    avg_rescue_moves = {k: [] for k in k_values}
+    prob_crew_rescue = {k: [] for k in k_values}
+    avg_crew_saved = {k: [] for k in k_values}
+
+    for k in k_values:
+        for alpha in alpha_values:
+            metric1, metric2, metric3 = Bot3(k, alpha, max_iter, timeout)
+            print(f"k: {k}, Alpha: {alpha}\nAverage Rescue Moves: {metric1}\nProbability of Crew Rescue: {metric2}\nAverage Crew Saved: {metric3}\n")
+            avg_rescue_moves[k].append(metric1)
+            prob_crew_rescue[k].append(metric2)
+            avg_crew_saved[k].append(metric3)
+
+    return avg_rescue_moves, prob_crew_rescue, avg_crew_saved
+
+def Bot4_simulation(alpha_values, k_values, max_iter, timeout):
+    avg_rescue_moves = {k: [] for k in k_values}
+    prob_crew_rescue = {k: [] for k in k_values}
+    avg_crew_saved = {k: [] for k in k_values}
+
+    for k in k_values:
+        for alpha in alpha_values:
+            metric1, metric2, metric3 = Bot4(k, alpha, max_iter, timeout)
+            print(f"k: {k}, Alpha: {alpha}\nAverage Rescue Moves: {metric1}\nProbability of Crew Rescue: {metric2}\nAverage Crew Saved: {metric3}\n")
+            avg_rescue_moves[k].append(metric1)
+            prob_crew_rescue[k].append(metric2)
+            avg_crew_saved[k].append(metric3)
+            
+    return avg_rescue_moves, prob_crew_rescue, avg_crew_saved
+
+def Bot5_simulation(alpha_values, k_values, max_iter, timeout):
+    avg_rescue_moves = {k: [] for k in k_values}
+    prob_crew_rescue = {k: [] for k in k_values}
+    avg_crew_saved = {k: [] for k in k_values}
+
+    for k in k_values:
+        for alpha in alpha_values:
+            metric1, metric2, metric3 = Bot5(k, alpha, max_iter, timeout)
+            print(f"k: {k}, Alpha: {alpha}\nAverage Rescue Moves: {metric1}\nProbability of Crew Rescue: {metric2}\nAverage Crew Saved: {metric3}\n")
+            avg_rescue_moves[k].append(metric1)
+            prob_crew_rescue[k].append(metric2)
+            avg_crew_saved[k].append(metric3)
+            
+    return avg_rescue_moves, prob_crew_rescue, avg_crew_saved
+
+# Helper function to plot graphs for Bot 3, Bot 4, and Bot 5 for each alpha and k-value
+def plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_data, bot4_data, bot5_data, title, metric_num):
+    save_dir = './data/3v4v5'
+
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # Generate and save a plot for each k-value
+    for k in k_values:
+        plt.figure(figsize=(10, 6))
+        plt.plot(alpha_values, bot3_data[k], label=f'Bot 3, k={k}')
+        plt.plot(alpha_values, bot4_data[k], label=f'Bot 4, k={k}')
+        plt.plot(alpha_values, bot5_data[k], label=f'Bot 5, k={k}')
+        plt.title(f'{title} (k={k})')
+        plt.xlabel('alpha')
+        plt.ylabel(title)
+        plt.legend()
+        plt.grid(True)
+
+        filename = os.path.join(save_dir, f'metric{metric_num}_k{k}.png')
+        plt.savefig(filename)
+        plt.close()
+
+def one_alien_two_crew(alpha_values, k_values, max_iter, timeout):
+    bot3_avg_rescue_moves, bot3_prob_crew_rescue, bot3_avg_crew_saved = Bot3_simulation(alpha_values, k_values, max_iter, timeout)
+    bot4_avg_rescue_moves, bot4_prob_crew_rescue, bot4_avg_crew_saved = Bot4_simulation(alpha_values, k_values, max_iter, timeout)
+    bot5_avg_rescue_moves, bot5_prob_crew_rescue, bot5_avg_crew_saved = Bot5_simulation(alpha_values, k_values, max_iter, timeout)
+
+    print(bot3_avg_rescue_moves, bot3_prob_crew_rescue, bot3_avg_crew_saved, "\n")
+    print(bot4_avg_rescue_moves, bot4_prob_crew_rescue, bot4_avg_crew_saved, "\n")
+    print(bot5_avg_rescue_moves, bot5_prob_crew_rescue, bot5_avg_crew_saved, "\n")
+
+    plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_avg_rescue_moves, bot4_avg_rescue_moves, bot5_avg_rescue_moves, 'Average Rescue Moves', 1)
+    plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_prob_crew_rescue, bot4_prob_crew_rescue, bot5_prob_crew_rescue, 'Probability of Crew Rescue', 2)
+    plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_avg_crew_saved, bot4_avg_crew_saved, bot5_avg_crew_saved, 'Average Crew Saved', 3)
+
+
+
+
+
+# Bot 6 vs. Bot 7 vs. Bot 8
+
+def Bot6_simulation(alpha_values, k_values, max_iter, timeout):
+    avg_rescue_moves = {k: [] for k in k_values}
+    prob_crew_rescue = {k: [] for k in k_values}
+    avg_crew_saved = {k: [] for k in k_values}
+
+    for k in k_values:
+        for alpha in alpha_values:
+            metric1, metric2, metric3 = Bot6(k, alpha, max_iter, timeout)
+            print(f"k: {k}, Alpha: {alpha}\nAverage Rescue Moves: {metric1}\nProbability of Crew Rescue: {metric2}\nAverage Crew Saved: {metric3}\n")
+            avg_rescue_moves[k].append(metric1)
+            prob_crew_rescue[k].append(metric2)
+            avg_crew_saved[k].append(metric3)
+
+    return avg_rescue_moves, prob_crew_rescue, avg_crew_saved
+
+def Bot7_simulation(alpha_values, k_values, max_iter, timeout):
+    avg_rescue_moves = {k: [] for k in k_values}
+    prob_crew_rescue = {k: [] for k in k_values}
+    avg_crew_saved = {k: [] for k in k_values}
+
+    for k in k_values:
+        for alpha in alpha_values:
+            metric1, metric2, metric3 = Bot7(k, alpha, max_iter, timeout)
+            print(f"k: {k}, Alpha: {alpha}\nAverage Rescue Moves: {metric1}\nProbability of Crew Rescue: {metric2}\nAverage Crew Saved: {metric3}\n")
+            avg_rescue_moves[k].append(metric1)
+            prob_crew_rescue[k].append(metric2)
+            avg_crew_saved[k].append(metric3)
+            
+    return avg_rescue_moves, prob_crew_rescue, avg_crew_saved
+
+def Bot8_simulation(alpha_values, k_values, max_iter, timeout):
+    avg_rescue_moves = {k: [] for k in k_values}
+    prob_crew_rescue = {k: [] for k in k_values}
+    avg_crew_saved = {k: [] for k in k_values}
+
+    for k in k_values:
+        for alpha in alpha_values:
+            metric1, metric2, metric3 = Bot8(k, alpha, max_iter, timeout)
+            print(f"k: {k}, Alpha: {alpha}\nAverage Rescue Moves: {metric1}\nProbability of Crew Rescue: {metric2}\nAverage Crew Saved: {metric3}\n")
+            avg_rescue_moves[k].append(metric1)
+            prob_crew_rescue[k].append(metric2)
+            avg_crew_saved[k].append(metric3)
+            
+    return avg_rescue_moves, prob_crew_rescue, avg_crew_saved
+
+# Helper function to plot graphs for Bot 6, Bot 7, and Bot 8 for each alpha and k-value
+def plot_Bot6_vs_Bot7_vs_Bot8(alpha_values, k_values, bot6_data, bot7_data, bot8_data, title, metric_num):
+    save_dir = './data/6v7v8'
+
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # Generate and save a plot for each k-value
+    for k in k_values:
+        plt.figure(figsize=(10, 6))
+        plt.plot(alpha_values, bot6_data[k], label=f'Bot 6, k={k}')
+        plt.plot(alpha_values, bot7_data[k], label=f'Bot 7, k={k}')
+        plt.plot(alpha_values, bot8_data[k], label=f'Bot 8, k={k}')
+        plt.title(f'{title} (k={k})')
+        plt.xlabel('alpha')
+        plt.ylabel(title)
+        plt.legend()
+        plt.grid(True)
+
+        filename = os.path.join(save_dir, f'metric{metric_num}_k{k}.png')
+        plt.savefig(filename)
+        plt.close()
+
+def two_alien_two_crew(alpha_values, k_values, max_iter, timeout):
+    bot6_avg_rescue_moves, bot6_prob_crew_rescue, bot6_avg_crew_saved = Bot6_simulation(alpha_values, k_values, max_iter, timeout)
+    bot7_avg_rescue_moves, bot7_prob_crew_rescue, bot7_avg_crew_saved = Bot7_simulation(alpha_values, k_values, max_iter, timeout)
+    bot8_avg_rescue_moves, bot8_prob_crew_rescue, bot8_avg_crew_saved = Bot8_simulation(alpha_values, k_values, max_iter, timeout)
+
+    print(bot6_avg_rescue_moves, bot6_prob_crew_rescue, bot6_avg_crew_saved, "\n")
+    print(bot7_avg_rescue_moves, bot7_prob_crew_rescue, bot7_avg_crew_saved, "\n")
+    print(bot8_avg_rescue_moves, bot8_prob_crew_rescue, bot8_avg_crew_saved, "\n")
+
+    plot_Bot6_vs_Bot7_vs_Bot8(alpha_values, k_values, bot6_avg_rescue_moves, bot7_avg_rescue_moves, bot8_avg_rescue_moves, 'Average Rescue Moves', 1)
+    plot_Bot6_vs_Bot7_vs_Bot8(alpha_values, k_values, bot6_prob_crew_rescue, bot7_prob_crew_rescue, bot8_prob_crew_rescue, 'Probability of Crew Rescue', 2)
+    plot_Bot6_vs_Bot7_vs_Bot8(alpha_values, k_values, bot6_avg_crew_saved, bot7_avg_crew_saved, bot8_avg_crew_saved, 'Average Crew Saved', 3)
+
+
+
+
+
 # Testing Area
 
 # print(Bot1(3, 0.3, 2))
 # print(Bot2(3, 0.3, 2))
 # print(Bot3(3, 0.3, 2))
 # print(Bot4(3, 0.3, 2))
-print(Bot5(3, 0.3, 2))
+# print(Bot5(3, 0.3, 2))
 # print(Bot6(3, 0.3, 2))
 # print(Bot7(3, 0.3, 2))
 
-# Bot1_vs_Bot2()
+
+# alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
+# k_values = [1, 2, 3, 4]
+# max_iter = 30
+# timeout = 5000
+
+alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
+k_values = [3, 5]
+max_iter = 2
+timeout = 10000
+
+# one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
+# one_alien_two_crew(alpha_values, k_values, max_iter, timeout)
+two_alien_two_crew(alpha_values, k_values, max_iter, timeout)
