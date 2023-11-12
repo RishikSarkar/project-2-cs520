@@ -1988,7 +1988,7 @@ def two_alien_two_crew(alpha_values, k_values, max_iter, timeout):
 # print(Bot5(3, 0.1, 2, 10000))
 # print(Bot6(3, 0.1, 2, 10000))
 # print(Bot7(3, 0.1, 2, 10000))
-print(Bot8(3, 0.1, 2, 10000))
+# print(Bot8(3, 0.1, 2, 10000))
 
 
 # alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
@@ -2001,9 +2001,9 @@ k_values = [3]
 max_iter = 3
 timeout = 10000
 
-# one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
-# one_alien_two_crew(alpha_values, k_values, max_iter, timeout)
-# two_alien_two_crew(alpha_values, k_values, max_iter, timeout)
+one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
+one_alien_two_crew(alpha_values, k_values, max_iter, timeout)
+two_alien_two_crew(alpha_values, k_values, max_iter, timeout)
 
 
 
