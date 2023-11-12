@@ -38,7 +38,7 @@ As mentioned earlier, Bot 1 and Bot 2 both involve 1 bot, 1 alien, and 1 crew me
 
 \subsubsection{Bot 1}
 
-Bot 1 utilizes a crew sensor and an alien sensor at every single time step to figure out if there is a crew member or alien nearby. On top of that, the probabilities of the crew member and alien being at a particular cell are updated every time the bot and alien move. Bot 1 stores the probabilities of the crew and alien being in a certain cell (i, j) within two 30 x 30 probability matrices \textit{crew\_matrix} and \textit{alien\_matrix}.
+Bot 1 utilizes a crew sensor and an alien sensor at every single time step to figure out if there is a crew member or alien nearby. On top of that, the probabilities of the crew member and alien being at a particular cell are updated every time the bot and alien move. Bot 1 stores the probabilities of the crew and alien being in a certain cell (i, j) within two probability matrices (represented as a dictionary of open cells + bot's current location) \textit{crew\_matrix} and \textit{alien\_matrix}.
 
 \subsubsection{Bot 2}
 
