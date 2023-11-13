@@ -30,7 +30,7 @@ This project is similar to the first one in that it involves a bot traversing th
     \item 4: Crew Member(s)
 \end{itemize}
 
-Furthermore, as defined in the project outline, there are 8 possible scenarios involving different combinations of bots, crew members, and aliens. Bots 1 and 2 involve 1 bot, 1 crew member, and 1 alien; Bots 3, 4, and 5 involve 1 bot, 2 crew members, and 1 alien; and Bots 6, 7, and 8 involve 1 bot, 2 crew members, and 2 aliens. Each scenario involves certain similarities and differences in the grid traversal algorithm for the bot, but all of them involve deterministic and probabilistic processes that I shall outline below.
+Furthermore, as defined in the project outline, there are 8 possible scenarios involving different combinations of bots, crew members, and aliens. Bots 1 and 2 involve 1 bot, 1 crew member, and 1 alien; Bots 3, 4, and 5 involve 1 bot, 2 crew members, and 1 alien; and Bots 6, 7, and 8 involve 1 bot, 2 crew members, and 2 aliens. Each scenario involves certain similarities and differences in the grid traversal algorithm for the bot, but all of them involve deterministic and probabilistic processes that I shall outline below. I shall go over Bot 1 thoroughly, but for the sake of conciseness, I will only delve into the key changes made to the other bots.
 
 \subsection{One Alien, One Crew}
 
@@ -38,9 +38,70 @@ As mentioned earlier, Bot 1 and Bot 2 both involve 1 bot, 1 alien, and 1 crew me
 
 \subsubsection{Bot 1}
 
-Bot 1 utilizes a crew sensor and an alien sensor at every single time step to figure out if there is a crew member or alien nearby. On top of that, the probabilities of the crew member and alien being at a particular cell are updated every time the bot and alien move. Bot 1 stores the probabilities of the crew and alien being in a certain cell (i, j) within two probability matrices (represented as a dictionary of open cells + bot's current location) \textit{crew\_matrix} and \textit{alien\_matrix}.
+Bot 1 utilizes a crew sensor and an alien sensor at every single time step to figure out if there is a crew member or alien nearby. On top of that, the probabilities of the crew member and alien being at a particular cell are updated every time the bot and alien move. Bot 1 stores the probabilities of the crew and alien being in a certain cell (i, j) within two probability matrices (represented as a dictionary of open cells + bot's current location) \textit{crew\_matrix} and \textit{alien\_matrix}. The process for Bot 1's maze traversal is as follows:
+
+\begin{enumerate}
+    \item Initialize a 30 x 30 grid and place the bot, one alien, and one crew member at random locations. The alien is placed outside a (2k + 1) x (2k + 1) square around the bot, and the crew member is placed at any location apart from the bot's current cell. Also, initialize additional metric calculation variables for win\_count, loss\_count, move (i.e., counter for \# of moves per crew member), etc.
+    \item Check for valid neighbors from the bot's current location (i.e., a list of open cells that the bot can move to at a given time)
+    \item Determine the best neighbor for the bot to move to (including itself) based on the probabilities in the \textit{crew\_matrix} and \textit{alien\_matrix}.
+    \begin{itemize}
+        \item Bot 1 prioritizes cells with a 0 probability of an alien being in it. Suppose no cells are found with a 0 probability of the alien (reflected in the alien matrix). In that case, the bot prioritizes cells with a non-zero probability of the crew member being in it. This is to prevent the bot from going to cells it has visited before or those that are unlikely to contain a crew member at all (unless necessary, in case of an alien being nearby or if no such cells exist). When the bot finds two neighbors with an equal probability of the crew member being in it, it randomly breaks the tie and picks the next move.
+    \end{itemize}
+    \item The bot moves to the determined best neighbor
+    \begin{itemize}
+        \item The number of moves is incremented by 1
+        \item If the bot enters the crew member's cell at this point, a win point is awarded to it, and a new crew member is placed at another random location on the grid (adhering to the previous constraints). The number of moves is also reset. The win point and the number of moves taken are recorded to be returned as metrics later.
+        \item If the bot enters the alien's cell or if the number of moves $\geq$ a timeout parameter, a marker is returned depicting that it has been captured or timed out, and a new session begins in the same grid with a newly placed bot, alien, and crew member. Except for the win and loss counts, every other variable is reinitialized (including the alien and crew matrices).
+    \end{itemize}
+    \item After the bot has moved, the alien and crew matrices are updated based on the new beliefs and knowledge:
+    \begin{itemize}
+        \item Since we know that the new bot location does not contain a crew member (even if it did earlier, it has been teleported away) or an alien, we can set the current cell to have a 0 probability for both crew and alien in their respective matrices (dictionaries).
+        \item We must now normalize the probabilities for the rest of the cells within the two matrices so that the total adds up to 1.
+    \end{itemize}
+    \item Next, the alien moves to a random neighboring cell or stays in place.
+    \begin{itemize}
+        \item If the alien enters the bot's cell at this point, a marker is returned depicting that the bot has been captured, and a new session begins in the same grid with a newly placed bot, alien, and crew member. Except for the win and loss counts, every other variable is reinitialized (including the alien and crew matrices).
+    \end{itemize}
+    \item After the alien moves, the alien matrix is updated once again based on the new beliefs and knowledge:
+    \begin{itemize}
+        \item When the alien moves, the probability of the alien being in the cell is distributed over all the neighboring cells and the current cell for every cell. The thought process behind this was that there should be an equal likelihood of the alien moving to any of its neighboring cells (or itself) every time the alien move occurs. This allows for a more thorough probabilistic distribution of where the alien might be after it moves.
+    \end{itemize}
+    \item After the bot and alien move, the alien sensor is activated. The bot inputs the k-value of the sensor as a parameter k, and this deterministic value represents the range of the detection square. 
+    \begin{itemize}
+        \item As mentioned earlier, the detection square is centered around the bot, and it returns a beep (i.e., the function returns \emph{True}) if the alien is detected within the detection range (if alien-x $<$ bot-x + k and alien-x $>$ bot-x - k and alien-y $<$ bot-y + k and alien-y $>$ bot-y - k) and doesn't return a beep if not (i.e., the function returns \emph{False}). 
+        \item The beep value is stored within a variable \emph{alien\_detected}.
+    \end{itemize}
+    \item After the alien sensor activates, the crew sensor is activated. The bot inputs the $\alpha$-value of the sensor as a parameter alpha, which modulates the probability of a beep occurring for a crew member d-steps away. The process taken by the sensor is as follows:
+    \begin{itemize}
+        \item The bot maintains a dictionary called \emph{d\_lookup\_table} that contains every cell the bot has visited as keys and the corresponding \emph{d\_dict} dictionaries as values. Each \emph{d\_dict} dictionary contains the shortest distance d from the corresponding bot to every other open cell in the grid as values with the open cells as keys.
+        \item If the bot's current cell has not been visited before, it utilizes a modified Dijkstra's search (using BFS) to calculate the shortest distance d to every open cell in the grid and stores the dictionary as the value with the bot's cell as the key within \emph{d\_lookup\_table}.
+        \item If the bot has visited the current cell before (and it is a key within \emph{d\_lookup\_table}, the \emph{d\_dict} is retrieved.
+        \item The lookup table is maintained to avoid running Dijkstra's whenever a bot enters a cell. Although it increases space complexity, the process dramatically reduces the total computation time needed for the sensor to run.
+        \item The \emph{d\_dict} is used to find the actual shortest deterministic distance d to the crew member from the bot, and the sensor returns a beep (i.e., \emph{True}) with probability: $e^{(-\alpha \cdot (d - 1))}$.
+        \item As the $\alpha$ value increases, the probability of the beep decreases for when d is farther away.
+        \item The beep value is stored within a variable \emph{crew\_detected}.
+    \end{itemize}
+    \item After the \emph{alien\_detected} and \emph{crew\_detected} variables are stored, the \emph{alien\_matrix} and \emph{crew\_matrix} are updated based on whether a beep was returned for each sensor.
+    \item The updates occurring within the \emph{alien\_matrix} are as follows:
+    \begin{itemize}
+        \item If the alien sensor beeps, the bot knows that the alien is within the range of the detection square. Thus, it can be inferred that every cell outside the detection square must have a probability of 0 (since there is only one alien), and the probability of the alien being in any of the cells inside the square must be normalized.
+        \item If the alien sensor doesn't beep, the bot knows that the alien is not within the range of the detection square. Thus, it can be inferred that every cell inside the detection square must have a probability of 0, and the probabilities of the alien being in any of the cells outside the square must be normalized.
+    \end{itemize}
+    \item The updates occurring within the \emph{crew\_matrix} are as follows:
+    \begin{itemize}
+        \item If the crew sensor beeps, the bot modifies the probabilities of all the cells within the crew matrix by multiplying the prior probability of the cell containing the crew member by the likelihood of receiving the beep given its deterministic distance d from the bot (i.e., $e^{(-\alpha \cdot (d - 1))}$ for the cell's d). The distance d is once again retrieved from the \emph{d\_lookup\_table} defined earlier (and updated with the crew sensor).
+        \item If the crew sensor doesn't beep, the bot modifies the probabilities of all the cells within the crew matrix by multiplying the prior probability of the cell containing the crew member by the likelihood of not receiving the beep given its deterministic distance d from the bot (i.e., $1 - e^{(-\alpha \cdot (d - 1))}$ for the cell's d).
+        \item This update is done because the beep being heard is more likely in cells closer to the bot if the crew is there, so the presence of a beep indicates that the crew member might be closer. In the absence of the bot, we do the opposite since the crew member is more likely to be farther away.
+        \item Finally, the probabilities for all the entries are normalized by dividing them by the sum of all the probability estimates for the total to equal 1.
+    \end{itemize}
+    \item This process continues until the total number of wins + losses equals a maximum iteration threshold. At the end of the simulation loop, the average rescue moves (i.e., sum of move for every win // total wins), the probability of rescuing the crew (i.e., wins / (wins + losses)), and the average number of rescued crew (i.e., wins) are returned.
+\end{enumerate}
+
+This was the most thorough explanation of the processes we took for a single bot. From here on, I shall focus only on the steps taken by the other bots that differ from Bot 1.
 
 \subsubsection{Bot 2}
+
+Bot 2 takes the exact same approach as Bot 1 for every function except for the one used to calculate the best next move for the bot given the alien and crew matrices.
 
 \subsection{One Alien, Two Crew}
 

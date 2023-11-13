@@ -975,7 +975,7 @@ def Bot1(k, alpha, max_iter, timeout):
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
+    return sum(win_move_count) // max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
@@ -1078,7 +1078,7 @@ def Bot2(k, alpha, max_iter, timeout):
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
+    return sum(win_move_count) // max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
@@ -1186,7 +1186,7 @@ def Bot3(k, alpha, max_iter, timeout):
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
+    return sum(win_move_count) // max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
@@ -1294,7 +1294,7 @@ def Bot4(k, alpha, max_iter, timeout):
 
         crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping_crew, open_cells) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
+    return sum(win_move_count) // max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
@@ -1402,7 +1402,7 @@ def Bot5(k, alpha, max_iter, timeout):
 
         crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping_crew, open_cells) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
+    return sum(win_move_count) // max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
@@ -1513,7 +1513,7 @@ def Bot6(k, alpha, max_iter, timeout):
 
         crew_matrix = update_crewmatrix(crew_matrix, crew_detected, d_lookup_table, bot, alpha) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
+    return sum(win_move_count) // max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
@@ -1626,7 +1626,7 @@ def Bot7(k, alpha, max_iter, timeout):
 
         crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping_crew, open_cells) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
+    return sum(win_move_count) // max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
@@ -1737,7 +1737,7 @@ def Bot8(k, alpha, max_iter, timeout):
 
         crew_matrix = update_crewmatrix_2crew(crew_matrix, crew_detected, d_lookup_table, bot, alpha, index_mapping_crew, open_cells) # Update based on crew sensor 
 
-    return sum(win_move_count) / max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
+    return sum(win_move_count) // max(1, len(win_move_count)), (win_count / max(1, (win_count + loss_count))), win_count
 
 
 
@@ -2004,9 +2004,9 @@ def two_alien_two_crew(alpha_values, k_values, max_iter, timeout):
 # max_iter = 30
 # timeout = 10000
 
-alpha_values = [0.3]
+alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
 k_values = [3]
-max_iter = 2
+max_iter = 3
 timeout = 10000
 
 one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
