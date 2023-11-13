@@ -2117,6 +2117,60 @@ bot5_metric3[1] = [17, 17, 16, 15, 14]
 bot5_metric3[3] = [18, 17, 17, 15, 15]
 bot5_metric3[5] = [18, 17, 17, 16, 15]
 
-plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_metric1, bot4_metric1, bot5_metric1, 'Average Rescue Moves', 1)
-plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_metric2, bot4_metric2, bot5_metric2, 'Probability of Crew Rescue', 2)
-plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_metric3, bot4_metric3, bot5_metric3, 'Average Crew Saved', 3)
+# plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_metric1, bot4_metric1, bot5_metric1, 'Average Rescue Moves', 1)
+# plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_metric2, bot4_metric2, bot5_metric2, 'Probability of Crew Rescue', 2)
+# plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_metric3, bot4_metric3, bot5_metric3, 'Average Crew Saved', 3)
+
+
+# Bot 6 vs. Bot 7 vs. Bot 8
+
+bot6_metric1 = {}
+bot6_metric1[1] = [1438, 1520, 1697, 1604, 1789]
+bot6_metric1[3] = [1557, 1691, 1602, 1778, 1663]
+bot6_metric1[5] = [1619, 1762, 1608, 1785, 1867]
+
+bot6_metric2 = {}
+bot6_metric2[1] = [0.533, 0.6, 0.567, 0.633, 0.5]
+bot6_metric2[3] = [0.6, 0.567, 0.6, 0.567, 0.533]
+bot6_metric2[5] = [0.633, 0.567, 0.567, 0.533, 0.5]
+
+bot6_metric3 = {}
+bot6_metric3[1] = [16, 18, 17, 19, 15]
+bot6_metric3[3] = [18, 17, 19, 18, 17]
+bot6_metric3[5] = [19, 17, 16, 15, 16]
+
+
+bot7_metric1 = {}
+bot7_metric1[1] = [1524, 1562, 1696, 1711, 1808]
+bot7_metric1[3] = [1579, 1621, 1564, 1677, 1793]
+bot7_metric1[5] = [1695, 1738, 1776, 1679, 1874]
+
+bot7_metric2 = {}
+bot7_metric2[1] = [0.5, 0.533, 0.567, 0.533, 0.5]
+bot7_metric2[3] = [0.567, 0.6, 0.633, 0.6, 0.567]
+bot7_metric2[5] = [0.533, 0.567, 0.6, 0.567, 0.533]
+
+bot7_metric3 = {}
+bot7_metric3[1] = [15, 16, 17, 16, 15]
+bot7_metric3[3] = [17, 18, 19, 18, 17]
+bot7_metric3[5] = [16, 17, 18, 17, 16]
+
+
+bot8_metric1 = {}
+bot8_metric1[1] = [1703, 1842, 1789, 1882, 2074]
+bot8_metric1[3] = [1758, 1903, 1847, 1939, 2034]
+bot8_metric1[5] = [1873, 1869, 1711, 1853, 2148]
+
+bot8_metric2 = {}
+bot8_metric2[1] = [0.533, 0.567, 0.6, 0.567, 0.533]
+bot8_metric2[3] = [0.6, 0.633, 0.667, 0.633, 0.6]
+bot8_metric2[5] = [0.567, 0.6, 0.633, 0.6, 0.5]
+
+bot8_metric3 = {}
+bot8_metric3[1] = [16, 17, 18, 17, 16]
+bot8_metric3[3] = [18, 19, 18, 16, 18]
+bot8_metric3[5] = [17, 18, 17, 18, 15]
+
+plot_Bot6_vs_Bot7_vs_Bot8(alpha_values, k_values, bot6_metric1, bot7_metric1, bot8_metric1, 'Average Rescue Moves', 1)
+plot_Bot6_vs_Bot7_vs_Bot8(alpha_values, k_values, bot6_metric2, bot7_metric2, bot8_metric2, 'Probability of Crew Rescue', 2)
+plot_Bot6_vs_Bot7_vs_Bot8(alpha_values, k_values, bot6_metric3, bot7_metric3, bot8_metric3, 'Average Crew Saved', 3)
