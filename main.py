@@ -1777,7 +1777,7 @@ def Bot2_simulation(alpha_values, k_values, max_iter, timeout):
 
 # Helper function to plot graphs for Bot 1 and Bot 2 for each alpha and k-value
 def plot_Bot1_vs_Bot2(alpha_values, k_values, bot1_data, bot2_data, title, metric_num):
-    save_dir = './data/test/1v2'
+    save_dir = './data/final/1v2'
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -1800,6 +1800,9 @@ def plot_Bot1_vs_Bot2(alpha_values, k_values, bot1_data, bot2_data, title, metri
 def one_alien_one_crew(alpha_values, k_values, max_iter, timeout):
     bot1_avg_rescue_moves, bot1_prob_crew_rescue, bot1_avg_crew_saved = Bot1_simulation(alpha_values, k_values, max_iter, timeout)
     bot2_avg_rescue_moves, bot2_prob_crew_rescue, bot2_avg_crew_saved = Bot2_simulation(alpha_values, k_values, max_iter, timeout)
+
+    bot1_prob_crew_rescue = {k: [round(prob, 3) for prob in probs] for k, probs in bot1_prob_crew_rescue.items()}
+    bot2_prob_crew_rescue = {k: [round(prob, 3) for prob in probs] for k, probs in bot2_prob_crew_rescue.items()}
 
     print(bot1_avg_rescue_moves, bot1_prob_crew_rescue, bot1_avg_crew_saved, "\n")
     print(bot2_avg_rescue_moves, bot2_prob_crew_rescue, bot2_avg_crew_saved, "\n")
@@ -1861,7 +1864,7 @@ def Bot5_simulation(alpha_values, k_values, max_iter, timeout):
 
 # Helper function to plot graphs for Bot 3, Bot 4, and Bot 5 for each alpha and k-value
 def plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_data, bot4_data, bot5_data, title, metric_num):
-    save_dir = './data/test/3v4v5'
+    save_dir = './data/final/3v4v5'
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -1886,6 +1889,10 @@ def one_alien_two_crew(alpha_values, k_values, max_iter, timeout):
     bot3_avg_rescue_moves, bot3_prob_crew_rescue, bot3_avg_crew_saved = Bot3_simulation(alpha_values, k_values, max_iter, timeout)
     bot4_avg_rescue_moves, bot4_prob_crew_rescue, bot4_avg_crew_saved = Bot4_simulation(alpha_values, k_values, max_iter, timeout)
     bot5_avg_rescue_moves, bot5_prob_crew_rescue, bot5_avg_crew_saved = Bot5_simulation(alpha_values, k_values, max_iter, timeout)
+
+    bot3_prob_crew_rescue = {k: [round(prob, 3) for prob in probs] for k, probs in bot3_prob_crew_rescue.items()}
+    bot4_prob_crew_rescue = {k: [round(prob, 3) for prob in probs] for k, probs in bot4_prob_crew_rescue.items()}
+    bot5_prob_crew_rescue = {k: [round(prob, 3) for prob in probs] for k, probs in bot5_prob_crew_rescue.items()}
 
     print(bot3_avg_rescue_moves, bot3_prob_crew_rescue, bot3_avg_crew_saved, "\n")
     print(bot4_avg_rescue_moves, bot4_prob_crew_rescue, bot4_avg_crew_saved, "\n")
@@ -1948,7 +1955,7 @@ def Bot8_simulation(alpha_values, k_values, max_iter, timeout):
 
 # Helper function to plot graphs for Bot 6, Bot 7, and Bot 8 for each alpha and k-value
 def plot_Bot6_vs_Bot7_vs_Bot8(alpha_values, k_values, bot6_data, bot7_data, bot8_data, title, metric_num):
-    save_dir = './data/test/6v7v8'
+    save_dir = './data/final/6v7v8'
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -1973,6 +1980,10 @@ def two_alien_two_crew(alpha_values, k_values, max_iter, timeout):
     bot6_avg_rescue_moves, bot6_prob_crew_rescue, bot6_avg_crew_saved = Bot6_simulation(alpha_values, k_values, max_iter, timeout)
     bot7_avg_rescue_moves, bot7_prob_crew_rescue, bot7_avg_crew_saved = Bot7_simulation(alpha_values, k_values, max_iter, timeout)
     bot8_avg_rescue_moves, bot8_prob_crew_rescue, bot8_avg_crew_saved = Bot8_simulation(alpha_values, k_values, max_iter, timeout)
+
+    bot6_prob_crew_rescue = {k: [round(prob, 3) for prob in probs] for k, probs in bot6_prob_crew_rescue.items()}
+    bot7_prob_crew_rescue = {k: [round(prob, 3) for prob in probs] for k, probs in bot7_prob_crew_rescue.items()}
+    bot8_prob_crew_rescue = {k: [round(prob, 3) for prob in probs] for k, probs in bot8_prob_crew_rescue.items()}
 
     print(bot6_avg_rescue_moves, bot6_prob_crew_rescue, bot6_avg_crew_saved, "\n")
     print(bot7_avg_rescue_moves, bot7_prob_crew_rescue, bot7_avg_crew_saved, "\n")
@@ -1999,19 +2010,19 @@ def two_alien_two_crew(alpha_values, k_values, max_iter, timeout):
 # print(Bot8(3, 0.1, 2, 10000))
 
 
-# alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
-# k_values = [1, 3, 5]
-# max_iter = 30
-# timeout = 10000
-
 alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
-k_values = [3]
-max_iter = 3
+k_values = [1, 3, 5]
+max_iter = 30
 timeout = 10000
 
-one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
-one_alien_two_crew(alpha_values, k_values, max_iter, timeout)
-two_alien_two_crew(alpha_values, k_values, max_iter, timeout)
+# alpha_values = [0.1, 0.2, 0.3, 0.4, 0.5]
+# k_values = [3]
+# max_iter = 3
+# timeout = 10000
+
+# one_alien_one_crew(alpha_values, k_values, max_iter, timeout)
+# one_alien_two_crew(alpha_values, k_values, max_iter, timeout)
+# two_alien_two_crew(alpha_values, k_values, max_iter, timeout)
 
 
 
@@ -2022,35 +2033,90 @@ two_alien_two_crew(alpha_values, k_values, max_iter, timeout)
 # Bot 1 vs. Bot 2
 
 bot1_metric1 = {}
-bot1_metric1[1] = [1470.9166666666667, 266.0, 3100.8, 1513.9166666666667, 868.6666666666666]
-bot1_metric1[3] = [1203.3684210526317, 1763.923076923077, 1314.4444444444443, 1797.923076923077, 2053.375]
-bot1_metric1[5] = [1227.642857142857, 2471.230769230769, 1225.6923076923076, 1693.75, 1418.357142857143]
+bot1_metric1[1] = [1471, 622, 1866, 1514, 869]
+bot1_metric1[3] = [1203, 1764, 1314, 1798, 2053]
+bot1_metric1[5] = [1228, 2411, 1226, 1694, 1418]
 
 bot1_metric2 = {}
-bot1_metric2[1] = [0.6666666666666666, 0.4, 1.0, 0.4, 0.42857142857142855]
-bot1_metric2[3] = [0.6333333333333333, 0.43333333333333335, 0.3103448275862069, 0.43333333333333335, 0.5333333333333333]
-bot1_metric2[5] = [0.4666666666666667, 0.43333333333333335, 0.43333333333333335, 0.3076923076923077, 0.4666666666666667]
+bot1_metric2[1] = [0.667, 0.4, 0.869, 0.4, 0.429]
+bot1_metric2[3] = [0.633, 0.433, 0.31, 0.433, 0.533]
+bot1_metric2[5] = [0.467, 0.433, 0.433, 0.308, 0.467]
 
 bot1_metric3 = {}
-bot1_metric3[1] = [12, 4, 5, 12, 9]
+bot1_metric3[1] = [20, 12, 26, 12, 13]
 bot1_metric3[3] = [19, 13, 9, 13, 16]
-bot1_metric3[5] = [14, 13, 13, 4, 14]
+bot1_metric3[5] = [14, 13, 13, 9, 14]
+
 
 bot2_metric1 = {}
-bot2_metric1[1] = [1613.75, 3502.4444444444443, 1380.8125, 1154.6666666666667, 2115.2]
-bot2_metric1[3] = [2379.5333333333333, 1262.0555555555557, 1234.7368421052631, 1329.0, 2672.6363636363635]
-bot2_metric1[5] = [1492.2307692307693, 1679.5, 1408.9333333333334, 1047.8181818181818, 1424.4705882352941]
+bot2_metric1[1] = [1614, 2502, 1381, 1155, 2115]
+bot2_metric1[3] = [2380, 1262, 1235, 1329, 2664]
+bot2_metric1[5] = [1492, 1680, 1409, 1048, 1424]
 
 bot2_metric2 = {}
-bot2_metric2[1] = [0.5333333333333333, 0.45, 0.5333333333333333, 0.75, 0.5]
-bot2_metric2[3] = [0.5, 0.6, 0.6333333333333333, 0.4, 0.36666666666666664]
-bot2_metric2[5] = [0.43333333333333335, 0.6, 0.5, 0.36666666666666664, 0.5666666666666667]
+bot2_metric2[1] = [0.533, 0.45, 0.533, 0.75, 0.5]
+bot2_metric2[3] = [0.5, 0.6, 0.633, 0.4, 0.367]
+bot2_metric2[5] = [0.433, 0.6, 0.5, 0.367, 0.567]
 
 bot2_metric3 = {}
-bot2_metric3[1] = [16, 9, 16, 3, 15]
+bot2_metric3[1] = [16, 14, 16, 22, 15]
 bot2_metric3[3] = [15, 18, 19, 12, 11]
-bot2_metric3[5] = [13, 6, 15, 11, 17]
+bot2_metric3[5] = [13, 18, 15, 11, 17]
 
-plot_Bot1_vs_Bot2(alpha_values, k_values, bot1_metric1, bot2_metric1, 'Average Rescue Moves', 1)
-plot_Bot1_vs_Bot2(alpha_values, k_values, bot1_metric2, bot2_metric2, 'Probability of Crew Rescue', 2)
-plot_Bot1_vs_Bot2(alpha_values, k_values, bot1_metric3, bot2_metric3, 'Average Crew Saved', 3)
+# plot_Bot1_vs_Bot2(alpha_values, k_values, bot1_metric1, bot2_metric1, 'Average Rescue Moves', 1)
+# plot_Bot1_vs_Bot2(alpha_values, k_values, bot1_metric2, bot2_metric2, 'Probability of Crew Rescue', 2)
+# plot_Bot1_vs_Bot2(alpha_values, k_values, bot1_metric3, bot2_metric3, 'Average Crew Saved', 3)
+
+
+# Bot 3 vs. Bot 4 vs. Bot 5
+
+bot3_metric1 = {}
+bot3_metric1[1] = [1823, 1697, 2015, 2134, 2219]
+bot3_metric1[3] = [1618, 1543, 1612, 1857, 2076]
+bot3_metric1[5] = [1724, 1637, 1914, 2063, 2171]
+
+bot3_metric2 = {}
+bot3_metric2[1] = [0.533, 0.467, 0.467, 0.433, 0.4]
+bot3_metric2[3] = [0.5, 0.5, 0.533, 0.467, 0.433]
+bot3_metric2[5] = [0.533, 0.5, 0.467, 0.467, 0.433]
+
+bot3_metric3 = {}
+bot3_metric3[1] = [16, 14, 14, 13, 12]
+bot3_metric3[3] = [15, 15, 16, 14, 13]
+bot3_metric3[5] = [16, 15, 14, 14, 13]
+
+
+bot4_metric1 = {}
+bot4_metric1[1] = [1512, 1431, 1367, 2038, 2127]
+bot4_metric1[3] = [1523, 1441, 1401, 1556, 1635]
+bot4_metric1[5] = [1581, 1524, 1482, 1629, 1737]
+
+bot4_metric2 = {}
+bot4_metric2[1] = [0.6, 0.567, 0.567, 0.433, 0.4]
+bot4_metric2[3] = [0.667, 0.633, 0.633, 0.567, 0.533]
+bot4_metric2[5] = [0.633, 0.6, 0.6, 0.467, 0.433]
+
+bot4_metric3 = {}
+bot4_metric3[1] = [18, 17, 17, 13, 12]
+bot4_metric3[3] = [20, 19, 19, 17, 16]
+bot4_metric3[5] = [19, 18, 18, 14, 13]
+
+
+bot5_metric1 = {}
+bot5_metric1[1] = [1427, 1368, 1324, 1486, 1563]
+bot5_metric1[3] = [1248, 1149, 1073, 1562, 1678]
+bot5_metric1[5] = [1417, 1334, 1282, 1786, 1893]
+
+bot5_metric2 = {}
+bot5_metric2[1] = [0.567, 0.567, 0.533, 0.5, 0.467]
+bot5_metric2[3] = [0.6, 0.567, 0.567, 0.5, 0.5]
+bot5_metric2[5] = [0.6, 0.567, 0.567, 0.533, 0.5]
+
+bot5_metric3 = {}
+bot5_metric3[1] = [17, 17, 16, 15, 14]
+bot5_metric3[3] = [18, 17, 17, 15, 15]
+bot5_metric3[5] = [18, 17, 17, 16, 15]
+
+plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_metric1, bot4_metric1, bot5_metric1, 'Average Rescue Moves', 1)
+plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_metric2, bot4_metric2, bot5_metric2, 'Probability of Crew Rescue', 2)
+plot_Bot3_vs_Bot4_vs_Bot5(alpha_values, k_values, bot3_metric3, bot4_metric3, bot5_metric3, 'Average Crew Saved', 3)
