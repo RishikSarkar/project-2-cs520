@@ -224,7 +224,7 @@ The bot also updates beliefs when the aliens move. The probability can be formal
 
 \section{The Ideal Bot}
 
-
+To recap, the information that the bot has is the probabilities of where the alien is in the ship for each cell and the probabilities of where the crew is in the ship for each cell. An possible approach an ideal bot could take is utilize deterministic information with this probabilistic information. For example, the bot could determine the shortest path to the to the crew initially using BFS. As a result, the bot would now have knowledge of what cells to go to. However, since the environment is changing, the bot can use the probabilistic information introduced in this project, particularly the probabilities of where the alien is, to try to become aware of the alien's position and try to avoid it. Using this information, the bot can deviate from its calculated path as necessary. The reason why this bot could be considered ideal is because it would be efficient. For example, it would have more direction than the bots in this project in terms of what cells to go to due to the path planning in the beginning. In addition, it would be more efficient than the bots in project 1 as it would not have to recalculate its path each time step and could update its path based on the probabilities. 
 
 \section{Bonus}
 
